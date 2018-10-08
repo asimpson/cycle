@@ -8,6 +8,7 @@
 (ql:quickload "markdown.cl")
 (ql:quickload "sqlite")
 (ql:quickload "cl-json")
+(ql:quickload "str")
 
 (use-package :sqlite)
 (use-package :json)
@@ -24,10 +25,45 @@
 
 ;;sqlite
 (defvar *db* (connect "BLOG"))
-(print (execute-single *db* "select content from posts"))
-(print (execute-to-list *db* "select title, content from posts"))
+
 (disconnect *db*)
+
+(ql:system-apropos "list")
+
+(defun write-posts-to-file()
+  (let ((posts (execute-to-list *db* "select id,slug,title,pub_date,mod_date,excerpt,content from posts")))
+    (loop for post in posts
+       do
+         (with-open-file (x (concatenate 'string "posts/" (second post) ".html")
+                            :direction :output
+                            :if-exists :supersede)
+           (write-sequence (car (last post)) x)))))
+
+(write-posts-to-file)
+
+(defun write-data-to-file()
+  (let ((posts (execute-to-list *db* "select id,slug,title,pub_date,mod_date,excerpt from posts")))
+    (loop for post in posts
+       do
+         (with-open-file (x (concatenate 'string "posts/" (second post) ".json")
+                            :direction :output
+                            :if-exists :supersede)
+           (write-sequence (data-to-json post) x)))))
+
+(write-data-to-file)
+
+(defun data-to-json(post)
+  (let ((json (json:encode-json-to-string `(
+                                            ("id" . ,(first post))
+                                            ("slug" . ,(second post))
+                                            ("title" . ,(third post))
+                                            ("published" . ,(fourth post))
+                                            ("modified" . ,(fifth post))
+                                            ("excerpt" . ,(str:trim (sixth post)))))))
+    json))
 
 ;;json
 (print (assoc :foo
               (json:decode-json-from-string "{ \"foo\": \"bar\", \"baz\": \"adam\" }")))
+
+(json:encode-json '(("foo" . "value") ("bar" . "oo")))
