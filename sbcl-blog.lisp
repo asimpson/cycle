@@ -10,6 +10,8 @@
 (ql:quickload "cl-json")
 (ql:quickload "str")
 
+(ql:system-apropos "glob")
+
 (use-package :sqlite)
 (use-package :json)
 
@@ -25,21 +27,7 @@
 
 ;;sqlite
 (defvar *db* (connect "BLOG"))
-
 (disconnect *db*)
-
-(ql:system-apropos "list")
-
-(defun write-posts-to-file()
-  (let ((posts (execute-to-list *db* "select id,slug,title,pub_date,mod_date,excerpt,content from posts")))
-    (loop for post in posts
-       do
-         (with-open-file (x (concatenate 'string "posts/" (second post) ".html")
-                            :direction :output
-                            :if-exists :supersede)
-           (write-sequence (car (last post)) x)))))
-
-(write-posts-to-file)
 
 (defun write-data-to-file()
   (let ((posts (execute-to-list *db* "select id,slug,title,pub_date,mod_date,excerpt from posts")))
@@ -62,8 +50,9 @@
                                             ("excerpt" . ,(str:trim (sixth post)))))))
     json))
 
-;;json
-(print (assoc :foo
-              (json:decode-json-from-string "{ \"foo\": \"bar\", \"baz\": \"adam\" }")))
-
-(json:encode-json '(("foo" . "value") ("bar" . "oo")))
+(defun gen-md()
+  (let* ((files (uiop:directory-files "posts/" "*.html"))
+         (formatted (mapcar (lambda(file) `(,file . ,(car (str:split-omit-nulls "." (file-namestring file))))) files)))
+    (loop for file in formatted
+       do
+         (uiop:launch-program (str:concat "/usr/local/bin/pandoc " (uiop:unix-namestring (car file)) " --wrap=none -t gfm -o posts/" (cdr file) ".md")))))
