@@ -10,49 +10,46 @@
 (ql:quickload "cl-json")
 (ql:quickload "str")
 
-(ql:system-apropos "glob")
-
-(use-package :sqlite)
 (use-package :json)
 
-;;templates
-(let* ((post (markdown.cl:parse (uiop:read-file-string "post.md")))
-       (template (uiop:read-file-string "template.hbs"))
-       (rendered (mustache:render* template `((:content . ,post)))))
-  (print post)
-  (with-open-file (x "result.html"
-          :direction :output
-          :if-exists :supersede)
-        (write-sequence rendered x)))
-
-;;sqlite
-(defvar *db* (connect "BLOG"))
-(disconnect *db*)
-
-(defun write-data-to-file()
-  (let ((posts (execute-to-list *db* "select id,slug,title,pub_date,mod_date,excerpt from posts")))
-    (loop for post in posts
-       do
-         (with-open-file (x (concatenate 'string "posts/" (second post) ".json")
-                            :direction :output
-                            :if-exists :supersede)
-           (write-sequence (data-to-json post) x)))))
-
-(write-data-to-file)
-
-(defun data-to-json(post)
-  (let ((json (json:encode-json-to-string `(
-                                            ("id" . ,(first post))
-                                            ("slug" . ,(second post))
-                                            ("title" . ,(third post))
-                                            ("published" . ,(fourth post))
-                                            ("modified" . ,(fifth post))
-                                            ("excerpt" . ,(str:trim (sixth post)))))))
-    json))
-
 (defun gen-md()
+  "One-off command to turn html files into md files via pandco process."
   (let* ((files (uiop:directory-files "posts/" "*.html"))
          (formatted (mapcar (lambda(file) `(,file . ,(car (str:split-omit-nulls "." (file-namestring file))))) files)))
     (loop for file in formatted
        do
-         (uiop:launch-program (str:concat "/usr/local/bin/pandoc " (uiop:unix-namestring (car file)) " --wrap=none -t gfm -o posts/" (cdr file) ".md")))))
+         (uiop:launch-program (str:concat "/usr/local/bin/pandoc " (uiop:unix-namestring (car file)) " --wrap=none -o posts/" (cdr file) ".md")))))
+
+(defun gen-data()
+  "Read markdown posts from 'posts' dir and retrieve data from each matching json file."
+  (let* ((posts (uiop:directory-files "posts/" "*.md"))
+         (struct (mapcar
+                  (lambda(post)
+                    (list post (car (uiop:directory-files "posts/" (str:concat
+                                                                    (car (str:split-omit-nulls "." (file-namestring post)))
+                                                                    ".json"))))) posts)))
+    (mapcar #'parse-post struct)))
+
+(defun parse-post(post)
+  "Convert json data to list."
+  (let ((json (uiop:read-file-string (car (cdr post)))))
+    (json:decode-json-from-string json)))
+
+(defun gen-site()
+  "Generate site from post data, templates, and css file(s)."
+  (let ((data (gen-data))
+        (template (uiop:read-file-string "template.hbs"))
+        post
+        rendered)
+    (loop for pair in data
+       do
+         (setq post (markdown.cl:parse (uiop:read-file-string (str:concat "posts/" (cdr (assoc :slug pair)) ".md"))))
+         (setq rendered (mustache:render* template `((:content . ,post)
+                                                     (:link . ,(cdr (assoc :slug pair)))
+                                                     (:title . ,(cdr (assoc :title pair))))))
+         (with-open-file (x (str:concat "posts/result-" (cdr (assoc :slug pair)) ".html")
+          :direction :output
+          :if-exists :supersede)
+        (write-sequence rendered x)))))
+
+(gen-site)
