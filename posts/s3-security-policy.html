@@ -1,9 +1,0 @@
-<p>I love S3, I use it with <a href="http://www.haystacksoftware.com/arq/">Arq</a>, I use it to host this site, backup configs on VPSs, and to transfer random files that are too big for e-mail.</p>
-
-<p>As my S3 usage has grown I've started creating seperate AMI users for each task, e.g. a siteleaf user for this blog. It wasn't until tonight that I took the time to craft a better security policy for some of these users.</p>
-
-<p>I struggled finding good policy examples until I stumbled across <a href="http://blogs.aws.amazon.com/security/post/Tx1P2T3LFXXCNB5/Writing-IAM-policies-Grant-access-to-user-specific-folders-in-an-Amazon-S3-bucke">this one</a> over on the <a href="http://blogs.aws.amazon.com/security/">AWS Security blog</a>. I highly recommend reading it all the way through.</p>
-
-<p><a href="https://gist.github.com/asimpson/11335531">Here's the basic policy I came up with</a>. This policy restricts access to a single bucket, and allows access via the AWS cli.</p>
-
-<p>Note: I had to move the policy to a <a href="https://gist.github.com/asimpson/11335531">gist</a> as <a href="http://prismjs.com">prismjs</a> was having a hard time with it.</p>

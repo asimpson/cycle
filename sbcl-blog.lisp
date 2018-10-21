@@ -18,7 +18,7 @@
          (formatted (mapcar (lambda(file) `(,file . ,(car (str:split-omit-nulls "." (file-namestring file))))) files)))
     (loop for file in formatted
        do
-         (uiop:launch-program (str:concat "/usr/local/bin/pandoc " (uiop:unix-namestring (car file)) " --wrap=none -o posts/" (cdr file) ".md")))))
+         (uiop:launch-program (str:concat "/usr/local/bin/pandoc " (uiop:unix-namestring (car file)) " -t gfm --wrap=none -o posts/" (cdr file) ".md")))))
 
 (defun gen-data()
   "Read markdown posts from 'posts' dir and retrieve data from each matching json file."
@@ -47,7 +47,7 @@
          (setq rendered (mustache:render* template `((:content . ,post)
                                                      (:link . ,(cdr (assoc :slug pair)))
                                                      (:title . ,(cdr (assoc :title pair))))))
-         (with-open-file (x (str:concat "posts/result-" (cdr (assoc :slug pair)) ".html")
+         (with-open-file (x (str:concat "site/" (cdr (assoc :slug pair)) ".html")
           :direction :output
           :if-exists :supersede)
         (write-sequence rendered x)))))
