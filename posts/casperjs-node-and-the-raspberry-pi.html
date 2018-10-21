@@ -1,0 +1,25 @@
+<p>So I've been working on a pet project today, getting my Raspberry Pi to be a dedicated screen-scraping machine.</p>
+
+<p>I'm still in the middle of getting things working, so I'll be updating this post as I figure more stuff out. This post is intended to be a log for myself and hopefully a helpful resource for others.</p>
+
+<h2>Boot Image</h2>
+
+<p>I'm using the <a href="https://www.raspberrypi.org/downloads/raspbian/">Raspbian Jessie image</a> provided by Raspberry Pi. To create and backup my SD card images I'm using the excellent <a href="http://www.tweaking4all.com/hardware/raspberry-pi/macosx-apple-pi-baker/">ApplePi Baker</a> app. It provides a GUI wrapper around some gnarly command line tools to flash images to the Raspberry Pi SD card.</p>
+
+<h2>Installing Node</h2>
+
+<p><a href="http://blog.wia.io/installing-node-js-v4-0-0-on-a-raspberry-pi/">This post</a> by <a href="https://twitter.com/ConallLaverty">Conall Laverty</a> shows exactly how to get node and npm up and running on a Pi. I tried using the <code>apt-get</code> manager like I do with a VPS and the Pi wasn't liking it.</p>
+
+<h2>Installing CasperJS and Phantom</h2>
+
+<p>Another <a href="https://quaintproject.wordpress.com/2015/04/26/how-to-install-casperjs-on-the-raspberry-pi/">helpful post</a> by <a href="http://alexbilz.com">Alexander Bilz</a> shows how to get casperjs and a specialized version of phantomjs working on the Pi.</p>
+
+<p>I've run into issues with the 1.9.8 version of phantom compared to the 2.0 version on my laptop. Finding a compiled binary of 2.0 has proven to be quite difficult. So I'm on hold for now until I can get a 2.0 version running.</p>
+
+<h2>Troubleshooting</h2>
+
+<p>Since I'm using my Pi headless, I'm configuring everything over ssh. Sometimes this just doesn't work well. I've found VNC to be a nice solution in those cases. <a href="http://gettingstartedwithraspberrypi.tumblr.com/post/24142374137/setting-up-a-vnc-server">This post</a> has simple instructions for getting a VNC server up and running on your Pi. I use <a href="http://sourceforge.net/projects/chicken/">Chicken VNC</a> as the client on my Mac to connect to the Pi's server.</p>
+
+<h2>Speed</h2>
+
+<p>The Pi is slow. <em>Really</em> slow. I've found adding some <code>casper.wait</code>s to my code have helped iron out some random errors.</p>

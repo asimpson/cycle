@@ -1,0 +1,5 @@
+<p>This week I wrote a <a href="https://github.com/asimpson/dotfiles/blob/master/bash/functions#L10">bash function</a> that <code>curls</code> the <a href="https://sendgrid.com/pricing">SendGrid API</a> and sends a <a href="https://boxcar.io">Boxcar</a> notification. This is useful to chain to the end of long-running commands, e.g. <a href="https://github.com/donmelton/video_transcoding">transcoding a video</a>. When the command finishes I get a push notification on my phone.</p>
+
+<p>If you're unfamiliar with the various ways to chain commands together in bash, <a href="http://askubuntu.com/a/539293">here's a cheatsheet</a>. One thing I didn't know is that you can <em>combine</em> the various operators like <code>long-running command || alert "failure!" &amp;&amp; alert "success!"</code>.</p>
+
+<p>Happy scripting.</p>

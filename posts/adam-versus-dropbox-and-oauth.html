@@ -1,0 +1,45 @@
+<p>Frustration post incoming. If you'd like to skip my ranting, <a href="http://maxgif.com/8p">watch this breakdancing bear</a>. Otherwise, let's keep going.</p>
+
+<p>Update: I've posted an <a href="#update">update below</a>.</p>
+
+<h3>Stuck</h3>
+
+<p>I've never developed anything using <a href="https://www.dropbox.com/developers/reference/api">Dropbox's API</a> or <a href="http://oauth.net/">oAuth</a> before. I'm assuming I'm making a horrible, noobish mistake somewhere in here. There is no official PHP SDK for Dropbox API. There are a couple libraries floating around, but they looked like overkill for the simple app idea I'm working on.</p>
+
+<p>My problem is that when I try to <a href="https://www.dropbox.com/developers/reference/api#request-token">request a token</a> from Dropbox via PHP and cURL I get an 'Error 4xx'. I've looked at the oAuth specs for the proper parameters to send in the header of the request, and right now my request looks like:</p>
+
+<pre>
+<code class="language-php">
+[request_header] => POST /1/oauth/request_token HTTP/1.1
+Host: api.dropbox.com
+Accept: &lt;em>/&lt;/em>
+Authorization: OAuth oauth_consumer_key="CONSUMERKEY", oauth_nonce="1340748835", oauth_signature_method="PLAINTEXT", oauth_timestamp="1340748835", oauth_version="1.0", oauth_signature="CONSUMERSECRET%26"
+Content-Length: -1
+Content-Type: application/x-www-form-urlencoded
+Expect: 100-continue
+</code>
+</pre>
+
+<p>And this doesn't yield a token, just 'Error 4xx'.</p>
+
+<p>Yet, when I paste in the full request in the address bar of Chrome:</p>
+
+<p><code class="language-php"> 
+https://api.dropbox.com/1/oauth/request_token?oauth_consumer_key=CONSUMERKEY&amp;oauth_nonce=1340743892&amp;oauth_signature_method=PLAINTEXT&amp;oauth_timestamp=1340743892&amp;oauth_version=1.0&amp;oauth_signature=CONSUMERSECRET%26
+</code></p>
+
+<p>I get my token back no problem. So I'm assuming something is wrong with the format of my cURL request.</p>
+
+<p>The reason I'm using PLAINTEXT as the method is because of <a href="http://forums.dropbox.com/topic.php?id=49346&amp;replies=9#post-373358">this post</a> in the Dropbox forums. And, like I said, just entering in the request directly works fine.</p>
+
+<h3>Help</h3>
+
+<p>Any ideas? Let me know on Twitter <a href="http://www.twitter.com/a_simpson">@a_simpson</a>. I'll be sure to update this post once I get this problem sorted. So far, the lack of documentation for all this has been frustrating.</p>
+
+<h3 id="update">Update</h3>
+
+<p>Well I've sorted it out after sleeping on it, and breaking it all down again.</p>
+
+<p>Turns out the cURL options array I was passing was incorrect. I was declaring CURLOPT_POST => true after several other POST-reliant options such as CURLINFO_HEADER_OUT and CURLOPT_POSTFIELDS. This mix-up was causing the request to error out. In retropect I should have realized that right away, oh well. Once I got the order straightened out, the request went through.</p>
+
+<p>However, in my Googling to solve my problem I came across an <a href="http://wezfurlong.org/blog/2006/nov/http-post-from-php-without-curl/">awesome post from Wez Furlong</a> detailing how to do HTTP requests in PHP without using cURL or any other library. I'll let you read it, but all I'll say is I switched to the solution he outlines, and I love it.</p>

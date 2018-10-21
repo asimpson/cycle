@@ -1,0 +1,35 @@
+<p><a href="http://aleksandarsavic.com/nginx-redirect-wwwexamplecom-requests-to-examplecom-or-vice-versa/">Quick tip</a> for rewriting www.example.com to example.com or vice versa in <a href="http://nginx.com/">Nginx</a>.</p>
+
+<p>My conf file originally looked like:</p>
+
+<p><code class="language-php">
+server {
+server_name  www.example.com example.com;
+}
+</code></p>
+
+<p>I had to create another server block, and move all the conf information to the new block. In my case I was rewriting www to non-www.</p>
+
+<p><code class="language-php">
+server {
+server_name  www.example.com;
+//rewrite here;
+}
+server {
+server_name http://example.com;
+//all the server stuff goes in this block;
+}
+</code></p>
+
+<h3>Update</h3>
+
+<p>Instead of mucking around with rewriting, I should have just used return, like so:</p>
+
+<p><code class="language-php">
+server {
+server_name  www.example.com;
+return 301 http://example.org$request_uri;
+}
+</code></p>
+
+<p>The lesson is, always check out <a href="http://nginx.org/en/docs/http/converting_rewrite_rules.html">the official docs</a> before Google.</p>

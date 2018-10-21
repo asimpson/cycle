@@ -1,0 +1,109 @@
+<p>Here are a few custom little functions and aliases that I use everyday, these are all pretty straightforward, you can tweak any of these to fit your specific workflow.</p>
+<p><img src="/images/bash-bros.gif" alt="The Bash Brothers"></p>
+<h3 id="mamp-virtual-hosts">MAMP Virtual Hosts</h3>
+<p>It&#39;s a pain to set up virtual hosts, which is why I wrote a bash script to automate that horrible process. Here is the script, I&#39;ll explain how it works below (or check out the <a href="https://gist.github.com/3989062">Gist</a>):</p>
+<pre><code>    #!/bin/bash
+    RED=&quot;\033[0;31m&quot;
+    YELLOW=&quot;\033[33m&quot;
+    REDBG=&quot;\033[0;41m&quot;
+    WHITE=&quot;\033[1;37m&quot;
+    NC=&quot;\033[0m&quot;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;mkdir -p /Applications/MAMP/Library/vhosts;
+mkdir -p /Applications/MAMP/Library/vhosts/domains;
+
+if [ &quot;$1&quot; = &quot;create&quot; ] || [ &quot;$1&quot; = &quot;add&quot; ]; then
+ # Ask for document root
+  echo -e &quot;${RED}Enter the document root (relative to &#39;htdocs&#39;):${NC}&quot;;
+  read documentRoot;
+
+  # Ask for domain name
+  echo -e &quot;${RED}Enter local domain: (eg. local.com):${NC}&quot;;
+  read domain;
+
+   # Ask for port number
+  echo -e &quot;${RED}Enter MAMP Port Nubmer:${NC}&quot;;
+  read port;
+
+  # Add vhost
+  touch /Applications/MAMP/Library/vhosts/domains/$domain;
+
+  echo &quot;&lt;VirtualHost *:$port&gt;
+    DocumentRoot &quot;/Applications/MAMP/htdocs/$documentRoot&quot;
+    ServerName $domain
+    &lt;Directory &quot;/Applications/MAMP/htdocs/$documentRoot&quot;&gt;
+        Options All
+        AllowOverride All
+        Order allow,deny
+        Allow from all
+    &lt;/Directory&gt;
+&lt;/VirtualHost&gt;&quot; &gt;&gt; /Applications/MAMP/Library/vhosts/domains/$domain;
+
+  echo &quot;127.0.0.1 $domain&quot; &gt;&gt; /etc/hosts;
+
+  # Restart MAMP
+  /Applications/MAMP/bin/apache2/bin/apachectl restart;
+
+  echo -e &quot;Finished. ${REDBG}${WHITE}$domain:$port${NC} has been copied to your clipboard.&quot;;
+  echo &quot;$domain:$port&quot; | pbcopy;
+fi
+
+if [ &quot;$1&quot; = &quot;remove&quot; ] || [ &quot;$1&quot; = &quot;delete&quot; ]; then
+    echo -e &quot;${RED}Here are the current custom local domains:${NC}&quot;
+    for file in /Applications/MAMP/Library/vhosts/domains/*
+    do
+      if [ -f &quot;$file&quot; ];then
+       echo -e &quot;${YELLOW}${file##/*/}${NC}&quot;
+      fi
+    done
+    echo -e &quot;${RED}Enter the site name you wish to remove:${NC}&quot;
+    read siteName;
+
+    sed -i.bak &quot;/$siteName/d&quot; /etc/hosts;
+    rm /Applications/MAMP/Library/vhosts/domains/$siteName;
+
+    echo -e &quot;${YELLOW}$siteName removed.&quot;
+    fi
+</code></pre><p>The script is set up to work with each web project being stored in a directory under htdocs in the MAMP folder. If you want to use a different folder structure, simply change the paths in the script to reflect your particular workflow.</p>
+<p>The script asks for three pieces of info, the domain you want, the directory name, and the MAMP port number. The script creates a new directory called &#39;vhosts&#39; and a sub directory called &#39;vhosts/domains&#39;. Each file in &#39;domains&#39; is a single domain, which makes this all easier to manage. The script then modifies your etc/hosts file with the new domain information. Finally, the script restarts MAMP apache and copies the new domain address to your clipboard.</p>
+<p>The last piece to this puzzle is the function that fires this script off.</p>
+<pre><code>    function vhost {
+      sudo ~/.dotfiles/osx/mamp_vh.sh $1
+    }
+</code></pre><p>Just specify the path to the script and you are set.</p>
+<h3 id="jump-to-project-directory">Jump to project directory</h3>
+<p>Another pain point is jumping to a specific project directory quickly, and without a lot of path typing. I wrote a function that lists all the folders in my htdocs directory and lets me select the one I want to go to.</p>
+<pre><code>function ht {
+  local BLUE=&quot;\033[0;34m&quot;
+  local RED=&quot;\033[0;31m&quot;
+  local WHITE=&quot;\033[0;37m&quot;
+  local NC=&quot;\033[0m&quot;
+  echo -e &quot;${BLUE}Projects:${WHITE}&quot;
+    for file in /Applications/MAMP/htdocs/*
+    do
+      if [ -d &quot;$file&quot; ];then
+       echo ${file##/*/}
+      fi
+    done
+  echo -e &quot;${RED}Which Project?${NC}&quot;
+  read dir;
+  cd /Applications/MAMP/htdocs/$dir
+}
+</code></pre><p>Again, simply change the paths in the script to adapt this to your workflow.</p>
+<h3 id="colored-history-grep">Colored History Grep</h3>
+<p>One little alias that I snagged from the numerous dotfile repos on Github is the &#39;h&#39; alias which simply shortcuts the &#39;history&#39; command. I love this little command, but I found myself typing out <code>h | grep keyword</code> to get a list of commands specific to a keyword. I shortened this up and added color highlighting:</p>
+<pre><code>function hg {
+  history | grep --color=auto $1
+}
+</code></pre><p>Simply pass the function the term you are looking for. Remember you can execute previous functions by typing <code>!999</code> (999 being the number of the command).</p>
+<h3 id="keep-tweaking-and-hacking">Keep tweaking and hacking</h3>
+<p>Hopefully these little utilities were useful in someway, feel free to comment or offer advice by reaching out on <a href="http://twitter.com/a_simpson">twitter</a> or <a href="http://alpha.app.net/a_simpson">adn</a>.</p>
+<h3 id="update">Update</h3>
+<p>I forgot to mention that I have two documents, one called &quot;functions&quot; and the other &quot;aliases&quot;, which I source at the top of my .bash_profile like this (You can see all my dotfiles over on <a href="https://github.com/asimpson/dotfiles">Github</a>):</p>
+<pre><code>. /.dotfiles/bash/functions
+. /.dotfiles/bash/aliases
+</code></pre><p>Sourcing these files makes the functions and aliases inside them available on the command line. To use any of the functions or aliases in this post you have to source them to your bash, then you can simply type the alias or function name plus any arguments:</p>
+<pre><code>  vhost create
+  hg term
+  ht
+</code></pre><p>Thanks to <a href="https://twitter.com/jackmcdade/status/270926210798854145">Jack McDade</a> for the advice to include some examples.</p>

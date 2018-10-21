@@ -1,0 +1,38 @@
+<p>Recently I released a <a href="https://github.com/asimpson/adn-crossposter">App.net to Twitter cross-posting app</a> that runs via a single <a href="https://www.heroku.com/">Heroku</a> worker dyno (<a href="https://devcenter.heroku.com/articles/usage-and-billing#750-free-dyno-hours-per-app">which means it's free, gracias Heroku</a>).</p>
+
+<h3>IFTTT Issues</h3>
+
+<p>For awhile I had been using <a href="http://www.adamsimpson.net/ifttt">IFTTT</a> to crosspost any posts I made on App.net to Twitter, however there were two things I wasn't totally thrilled with.</p>
+
+<p>First, IFTTT automatically converts any links in your App.net post to <a href="https://bitly.com/">bit.ly links</a>, which stinks as I want the links in my intended format and style. 
+The other thing IFTTT did poorly was how it handled posts that were longer than 140 characters. Since App.net posts can be up to 256 characters, sometimes a post will be too long for Twitter, IFTTT would simply chop your post at the 140 character point and be done.</p>
+
+<h3>Features</h3>
+
+<p><a href="https://github.com/asimpson/adn-crossposter">ADN-Crossposter</a> specifically addresses these two complaints.</p>
+
+<p>First, it leaves links alone. The app simply pushes your post text to Twitter.</p>
+
+<p>Second, the app checks the character count of the App.net post and if it's longer than 140 character it trims the post and adds a link to the App.net post, e.g. a read more link.</p>
+
+<h3>Get the app</h3>
+
+<p><a href="https://github.com/asimpson/adn-crossposter">Clone the app</a>. Add your ADN username to the <code>config.rb</code> file. You can also choose how to handle @replies as well.</p>
+
+<h3>Twitter Setup</h3>
+
+<p>Since this is something that deals with Twitter there are a few steps involved in getting it up and running with their API. You will need to set up your own app within the <a href="https://dev.twitter.com/">Twitter dev panel</a>. Your Twitter app needs to have <em>read and write</em> access to your Twitter account for this to work. Once you have the app created you will need to copy the four OAuth keys into the <code>config.rb</code> file.</p>
+
+<p><em>You may need to regenerate your keys after changing your app from "Read" to "Read and Write".</em></p>
+
+<h3>Heroku Setup</h3>
+
+<p>Create a <a href="https://www.heroku.com/">Heroku app</a> via the Heroku dashboard. Go back to your local git repo and add this Heroku app as a git remote.</p>
+
+<h3>Launch</h3>
+
+<p>Run <code>git push HEROKU_REMOTE master</code> after committing all the necessary changes to the config.rb file. Heroku will detect what type of app it is automatically. Now set your process or worker dyno to 1 via the Heroku dashboard or the command line, <code>heroku ps:scale clock=1</code></p>
+
+<h3>Wrap Up</h3>
+
+<p>That's it. Whew. If for some reason the app isn't working, run <code>heroku logs</code> from the command line to see what the error was. If you still have issues, <a href="https://github.com/asimpson/adn-crossposter">create an issue on Github</a> with any log message you can.</p>

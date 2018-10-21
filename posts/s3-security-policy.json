@@ -1,0 +1,1 @@
+{"id":65,"slug":"s3-security-policy","title":"S3 Security Policy","published":"2014-04-26 03:01:17","modified":"2015-03-21 19:45:36","excerpt":"A basic AWS S3 bucket policy that restricts access to a single bucket, and allows access via the AWS cli."}

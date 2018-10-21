@@ -1,0 +1,20 @@
+<p>It&#39;s not secret that I&#39;ve become quite the Emacs fan over the past couple years. One of my favorite things about Emacs is the <a href="https://github.com/abo-abo/swiper">Ivy package</a> (and counsel and swiper of course). In exploring what Ivy was capable of I had the idea <a href="https://github.com/asimpson/ivy-feedwrangler">to write a small package</a> that used Ivy as the interface for my RSS service of choice, <a href="http://feedwrangler.net">Feedwrangler</a>. You can check out the repository <a href="https://github.com/asimpson/ivy-feedwrangler">here</a> and <a href="https://melpa.org/#/ivy-feedwrangler">install the package via melpa</a>.</p>
+<h2 id="what-is-ivy-">What is Ivy?</h2>
+<p>Ivy is, according to it&#39;s <a href="https://github.com/abo-abo/swiper">Github repo</a>, a &quot;a generic completion mechanism for Emacs.&quot; Quite simply Ivy is an interface for quickly working with lists of data whether that be:</p>
+<ul>
+<li>fuzzy-finding commands</li>
+<li>searching for files in a project</li>
+<li><a href="https://github.com/ecraven/ivy-pass">interacting</a> with the <a href="https://www.passwordstore.org">pass unix password manager</a></li>
+<li><a href="https://github.com/julienXX/ivy-lobsters">browsing lobste.rs</a></li>
+<li>or <a href="https://github.com/squiter/ivy-youtube">searching youtube</a></li>
+</ul>
+<h2 id="ivy-feedwrangler">Ivy-feedwrangler</h2>
+<p>Ivy makes manipulating and filtering lists super quick and easy. In fact, I&#39;d say it&#39;s <em>the</em> quickest way to work with this kind of data. Working with my RSS feed is now lightning fast. Here are a few features of ivy-feedwrangler:</p>
+<ul>
+<li>Mark individual posts as read or mark all as read</li>
+<li>View text posts inside a buffer in Emacs, this supports <a href="https://asimpson.github.io/ivy-feedwrangler/images/post-view.png">inline images</a>!</li>
+<li>Quickly filter through unread items since Ivy can handle regex out of the box</li>
+<li>Uses <a href="https://www.emacswiki.org/emacs/GnusAuthinfo">authinfo</a> to handle authentication which uses GPG to encrypt credentials.</li>
+</ul>
+<p>The other big perk to using ivy-feedwrangler is that, unlike <a href="https://github.com/skeeto/elfeed">elfeed</a> (<em>the</em> package for RSS in Emacs), it interacts directly with the <a href="https://feedwrangler.net/developers">Feedwrangler API</a>! That means I can read things in Emacs and that state is synced correctly to my phone and vice-versa.</p>
+<p>So, if you have a Feedwrangler account, give ivy-feedwrangler a try and let me know what you think!</p>

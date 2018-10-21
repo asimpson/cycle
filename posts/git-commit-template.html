@@ -1,0 +1,15 @@
+<p><a href="#add_your_own_template">TL;DR how do I do this?</a></p>
+
+<p>At work we've been moving toward <a href="https://github.com/sparkbox/how_to/tree/master/style/git">standardized Git commit messages</a>. By following the pattern, it's very easy to see what type of code is in a specific commit.</p>
+
+<p>We use <a href="https://sprint.ly/">Sprint.ly</a> and <a href="https://github.com/">Github</a>. Both of these services can perform actions based on what is in a commit message. <a href="https://github.com/blog/831-issues-2-0-the-next-generation">Github can close or reference an issue</a> if I type <code>closes #144</code> at the end of my commit. <a href="http://help.sprint.ly/knowledgebase/articles/108139-available-scm-vcs-commands">Sprint.ly can pull a commit message into a specific ticket</a> in much the same way.</p>
+
+<p>The problem with all this, is remembering to actually do it in the heat of the moment, when I'm buried in code and trying to push stuff out the door. That's why I put together a <a href="http://git-scm.com/book/ch7-1.html">Git commit message template</a>. All <a href="https://github.com/asimpson/dotfiles/blob/master/git/gitmessage.txt">my template</a> does is list the various flags and an example of how to reference a Sprint.ly ticket, but it shows this in my editor every time I commit. It's been incredibly useful.</p>
+
+<h3>Add your own template</h3>
+
+<ol>
+<li>Create a file to hold your template, e.g. <code>git-commit-template.txt</code>. Put in whatever you want to remember, just be sure to keep everything commented out (via #) or it will be in the actual message.</li>
+<li>Run <code>git config --global commit.template /path/to/git-commit-template.txt</code> or edit <code>~/.gitconfig</code> and add <code>template = /path/to/.gitmessage.txt</code> under the <code>[commit]</code> block.</li>
+<li>Done.</li>
+</ol>

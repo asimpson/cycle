@@ -1,0 +1,1 @@
+{"id":68,"slug":"iphone-checker-with-capybara-and-twilio","title":"iPhone checker with Capybara and Twilio","published":"2014-10-30 03:01:05","modified":"2015-04-03 11:53:41","excerpt":"I set up a small Heroku app that uses Capybara to check Apple's website for availability and sends a text to my phone via Twilio."}

@@ -1,0 +1,1 @@
+{"id":88,"slug":"command-line-notification","title":"Command line notification","published":"2016-01-16 15:40:26","modified":"2016-01-16 15:40:26","excerpt":"This week I wrote a bash function that curls the SendGrid API and sends a Boxcar notification."}

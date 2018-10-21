@@ -1,0 +1,19 @@
+<p>Screenshots in <code>README.md</code>s are really helpful to quickly demonstrate what your open source project does. Hosting those can be surprisingly difficult. There are a couple options:</p>
+<h2 id="the-problem">The Problem</h2>
+<ol>
+<li>Upload the image to a image hosting service and then reference the direct URL in the <code>README.md</code>.</li>
+<li>Check the image into the repo and reference its <code>raw</code> URL in the <code>README.md</code>.</li>
+</ol>
+<p>Both of these have their downsides. The first option means that your image is tied to the uptime of the image hosting service. If the service is down your image is now 404. Option two means you have the image mixed in with your source files which stinks from an organizational perspective.</p>
+<h2 id="the-solution">The Solution</h2>
+<p>The solution is fairly obvious but took me awhile to realize it: use <a href="https://pages.github.com">Github pages</a> by pushing assets to the <code>gh-pages</code> branch. </p>
+<p>Hosting assets via Github pages means I don&#39;t have to worry about the image hosting service uptime since Github is hosting both the <code>README.md</code> and the asset now. I also don&#39;t have to worry about those assets cluttering my source directories because Github pages uses a specific branch <code>gh-pages</code> and those assets only show up when that branch is checked out.</p>
+<p>Here&#39;s a quick walk-through of how to push an image to Github pages (assuming there isn&#39;t a <code>gh-pages</code> branch yet).</p>
+<ol>
+<li>Create a <code>gh-pages</code> branch off of <code>master</code> (usually).</li>
+<li>Add the image to the repo via <code>git add /path/to/image</code>.</li>
+<li>Stage, commit, and push the branch to Github.</li>
+<li>Go to Github and head to your project settings to grab the Github pages URL. Append the asset name to the end of it and check if you can view the image in your browser.</li>
+<li>Go back to the command line and checkout <code>master</code>.</li>
+<li>Add the image to the <code>README.md</code> and check it in.</li>
+</ol>

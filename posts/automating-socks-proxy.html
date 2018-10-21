@@ -1,0 +1,14 @@
+<p>I&#39;ve used a SOCKS proxy while on public WiFi ever since reading <a href="http://paulstamatiou.com/how-to-surf-securely-with-ssh-tunnel">Paul Stamatiou&#39;s article</a> years ago. I recently took the time to automate the setup process.</p>
+<p>Paul&#39;s article provides a good overview of what the heck a SOCKS proxy is and why it&#39;s beneficial, so I won&#39;t focus on any of that here. Just know that setting up a SOCKS proxy on a Mac is a multi-step process. This process led me to create <a href="https://github.com/asimpson/dotfiles/blob/master/bash/functions#L10-L17">two bash functions</a>; one to start it and another to shut it down.</p>
+<pre><code>function tunnel_off {
+  PID=&quot;$(ps aux | grep $1 | grep -v grep | awk &#39;{print $2}&#39;)&quot;;
+  kill ${PID} &amp;&amp; networksetup -setsocksfirewallproxystate Wi-Fi off;
+}
+
+function tunnel {
+  ssh -D 8080 -f -q -N $1 &amp;&amp; networksetup -setsocksfirewallproxystate Wi-Fi on
+}
+</code></pre><p>I do need to pass the ssh server name (configured in <code>~/.ssh/config</code>) I want to use, e.g. <code>tunnel vpn</code>.</p>
+<p>The only setup is to manually configure which port I want to use for the SOCKS proxy, I set that in System Preferences under Network: <img src="/images/socks-proxy-config.jpg" alt=""></p>
+<p>The best part is the <code>networksetup -setsocksfirewallproxystate</code> <a href="https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man8/networksetup.8.html">command</a>. This command makes the whole thing go by toggling the proxy on and off.</p>
+<p>For extra credit, I use the fantastic <a href="http://www.richsomerfield.com/apps/">TextBar</a> utility to monitor if the ssh connection is active and <a href="https://github.com/asimpson/dotfiles/blob/master/tmux/tunnel-status.sh">display the lightning emoji</a> in my menu bar if it is. I now know when the proxy is running or not by glancing up at the menubar.</p>
