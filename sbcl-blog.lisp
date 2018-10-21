@@ -39,6 +39,7 @@
   "Generate site from post data, templates, and css file(s)."
   (let ((data (gen-data))
         (template (uiop:read-file-string "template.hbs"))
+        (css (uiop:read-file-string "site.css"))
         post
         rendered)
     (loop for pair in data
@@ -46,6 +47,7 @@
          (setq post (markdown.cl:parse (uiop:read-file-string (str:concat "posts/" (cdr (assoc :slug pair)) ".md"))))
          (setq rendered (mustache:render* template `((:content . ,post)
                                                      (:link . ,(cdr (assoc :slug pair)))
+                                                     (:css . ,css)
                                                      (:title . ,(cdr (assoc :title pair))))))
          (with-open-file (x (str:concat "site/" (cdr (assoc :slug pair)) ".html")
           :direction :output
