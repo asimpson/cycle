@@ -5,10 +5,11 @@
 ;;; "sbcl-blog" goes here. Hacks and glory await!
 (require "asdf")
 (ql:quickload "cl-mustache")
-(ql:quickload "markdown.cl")
 (ql:quickload "sqlite")
 (ql:quickload "cl-json")
 (ql:quickload "str")
+(ql:quickload "3bmd")
+(ql:quickload "3bmd-ext-code-blocks")
 
 (use-package :json)
 
@@ -40,11 +41,13 @@
   (let ((data (gen-data))
         (template (uiop:read-file-string "template.hbs"))
         (css (uiop:read-file-string "site.css"))
+        (3bmd-code-blocks:*code-blocks* t)
         post
         rendered)
     (loop for pair in data
        do
-         (setq post (markdown.cl:parse (uiop:read-file-string (str:concat "posts/" (cdr (assoc :slug pair)) ".md"))))
+         (setq post (with-output-to-string (p)
+                      (3bmd:parse-string-and-print-to-stream (uiop:read-file-string (str:concat "posts/" (cdr (assoc :slug pair)) ".md")) p)))
          (setq rendered (mustache:render* template `((:content . ,post)
                                                      (:link . ,(cdr (assoc :slug pair)))
                                                      (:css . ,css)
