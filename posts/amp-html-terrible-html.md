@@ -9,7 +9,4 @@ I agree with the first part, but is the answer developing a subset of HTML/JS/CS
 ## Update
 
 This post explores my misgivings in more detail:
-
-> “AMP HTML removes … the last 15 years of advancements to the open web platform.” — [@xander76](https://twitter.com/xander76) <https://t.co/VP6HWzg3Si> [pic.twitter.com/uEO7hOBQ8K](http://t.co/uEO7hOBQ8K)
-> 
-> — Michael Jackson (@mjackson) [October 7, 2015](https://twitter.com/mjackson/status/651905992813322240)
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">“AMP HTML removes … the last 15 years of advancements to the open web platform.” — <a href="https://twitter.com/xander76?ref_src=twsrc%5Etfw">@xander76</a> <a href="https://t.co/VP6HWzg3Si">https://t.co/VP6HWzg3Si</a> <a href="http://t.co/uEO7hOBQ8K">pic.twitter.com/uEO7hOBQ8K</a></p>&mdash; MICH🎄EL JACKSON (@mjackson) <a href="https://twitter.com/mjackson/status/651905992813322240?ref_src=twsrc%5Etfw">October 7, 2015</a></blockquote>

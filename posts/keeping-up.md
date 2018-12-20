@@ -8,7 +8,7 @@ I agree; there's good signal in those streams. However, it's incresingly difficu
 
 [Adam expressed](https://twitter.com/avclark/status/453220061831237632) another angle to this issue:
 
-> I can’t keep up with my twitter feeds, but everyone I follow is valuable to me. Do I trim down or stop worrying about *keeping up*?
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">I can’t keep up with my twitter feeds, but everyone I follow is valuable to me. Do I trim down or stop worrying about *keeping up*?</p>&mdash; Adam Clark (@avclark) <a href="https://twitter.com/avclark/status/453220061831237632?ref_src=twsrc%5Etfw">April 7, 2014</a></blockquote>
 
 Personally, I gave up trying to read my entire feed a while ago; it isn't feasible. I also try to be selective about how many folks I follow. The harsh reality is that eventually you won't be able to keep up. I recommend [News.Me](http://www.news.me/) which emails you the top couple links that were shared in your twitter feed the previous day.
 

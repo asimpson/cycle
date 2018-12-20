@@ -1,8 +1,6 @@
 Last week I gave a short introduction to using npm as a build tool at [GemCity JS](http://gemcityjs.com).
 
-> Here are the links and repo for my talk about "NPM as a build tool" at [@GemCityJS](https://twitter.com/GemCityJS).<https://t.co/pByIGcRNpO>
->
-> — Adam Simpson (@a\_simpson) [October 15, 2015](https://twitter.com/a_simpson/status/654693173667622914)
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Here are the links and repo for my talk about &quot;NPM as a build tool&quot; at <a href="https://twitter.com/GemCityJS?ref_src=twsrc%5Etfw">@GemCityJS</a>.<a href="https://t.co/pByIGcRNpO">https://t.co/pByIGcRNpO</a></p>&mdash; Adam Simpson (@a_simpson) <a href="https://twitter.com/a_simpson/status/654693173667622914?ref_src=twsrc%5Etfw">October 15, 2015</a></blockquote>
 
 ## Rewrite?
 
@@ -16,7 +14,7 @@ I was using two plugins, [grunt-usemin](https://github.com/yeoman/grunt-usemin) 
 
 For reference here is my old Grunt config:
 
-``` coffeescript
+``` language-coffeescript
 
  rev:
   files:
@@ -58,7 +56,7 @@ Since we're going to replace a grunt task with a npm script task, lets use ES6 g
 
 The code turns out to be fairly succicent:
 
-``` javascript
+``` language-javascript
 
 import rev from "rev-file";
 import path from "path";
@@ -87,7 +85,7 @@ assets.forEach((f) => {
 
 Now I have a task. How do I integrate this into my existing Grunt process? [npm scripts](https://docs.npmjs.com/misc/scripts) to the rescue. I created a new script entry in my `package.json` like this:
 
-``` javascript
+``` language-javascript
 
 "scripts": {
   "start": "node ./bin/www",

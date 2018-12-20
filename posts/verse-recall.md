@@ -1,8 +1,6 @@
 Whew, time to share something with the world I haven't really talked about online at all, my first and only (so far) iOS app. I did manage to find this tweet celebrating the launch (thanks to Twitter's advanced search):
 
-> A few days ago I released my first iOS app, <https://t.co/JTSSQe5EEL>. I’m pretty proud of it. Shipping feels good.
-> 
-> — Adam Simpson (@a\_simpson) [March 13, 2014](https://twitter.com/a_simpson/status/444072396362772481)
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">A few days ago I released my first iOS app, <a href="https://t.co/JTSSQe5EEL">https://t.co/JTSSQe5EEL</a>. I’m pretty proud of it. Shipping feels good.</p>&mdash; Adam Simpson (@a_simpson) <a href="https://twitter.com/a_simpson/status/444072396362772481?ref_src=twsrc%5Etfw">March 13, 2014</a></blockquote>
 
 Verse Recall was a Christmas gift to my Dad in 2013. He got a TestFlight beta, and it actually shipped in March. I'm pretty proud of it. The app was simple. It let you look up a Bible verse, save it locally to the device and schedule a local notification with the text of the verse. The goal was to help memorize verses.
 

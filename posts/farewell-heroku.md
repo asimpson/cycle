@@ -4,9 +4,7 @@ I've migrated my apps off [Heroku](https://www.heroku.com/) and won't be using t
 
 Heroku is a "hosting as a service" company. They try to take away the pain of deploying and managing web applications. They actually do this quite well, it's a great service. The "secret sauce" that made Heroku so good was it's free pricing tier. The free tier essentially allowed a single web or a single "worker" process to run 24/7. There was enough processing power to run apps or processes for a small number of users, perfect for apps like my [six plus checker](/writing/iphone-checker-with-capybara-and-twilio) or [youtuberss app](http://ytrss.co).
 
-> Ever tried subscribing to a [@YouTube](https://twitter.com/YouTube) channel via RSS? It's way difficult/impossible, so I made this. 📢 Introducing <http://t.co/PueJLtWd3u>
-> 
-> — Adam Simpson (@a\_simpson) [June 30, 2015](https://twitter.com/a_simpson/status/615897507592278018)
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Ever tried subscribing to a <a href="https://twitter.com/YouTube?ref_src=twsrc%5Etfw">@YouTube</a> channel via RSS? It&#39;s way difficult/impossible, so I made this.<br><br>📢 Introducing <a href="http://t.co/PueJLtWd3u">http://t.co/PueJLtWd3u</a></p>&mdash; Adam Simpson (@a_simpson) <a href="https://twitter.com/a_simpson/status/615897507592278018?ref_src=twsrc%5Etfw">June 30, 2015</a></blockquote>
 
 If apps grew popular enough they would hit processing limits and I could go in and scale the app up to meet demand. Scaling an app also meant that I was no longer in the free tier and would begin paying Heroku for the additional resources. It really was an ideal setup (from my perspective as a developer).
 
@@ -31,11 +29,9 @@ This is awesome. It illustrates the ideal scenario: no money up front to try som
 
 I tweeted yesterday:
 
-> Slowly migrating my apps away from Heroku. The new free tier restrictions are such a bummer.
-> 
-> — Adam Simpson (@a\_simpson) [October 4, 2015](https://twitter.com/a_simpson/status/650737554183094272)
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Slowly migrating my apps away from Heroku. The new free tier restrictions are such a bummer.</p>&mdash; Adam Simpson (@a_simpson) <a href="https://twitter.com/a_simpson/status/650737554183094272?ref_src=twsrc%5Etfw">October 4, 2015</a></blockquote>
 
-I've now finished moving my node apps over to [Chunkhost](https://chunkhost.com/r/46012). With Chunkhost I get 1GB of RAM for under $5/month by paying yearly and via bitcoin (I use [Coinbase](https://www.coinbase.com/join/526d7fc9d296a258e800005c) to purchase and manage Bitcoins). In comparison, Digital Ocean offers 512MB of RAM for $5/month. With the extra overhead from Chunkhost, I can easily host multiple apps on the same box. Plus, I've found that the two node apps I have running are both only using ~50MB of RAM\!
+I've now finished moving my node apps over to [Chunkhost](https://chunkhost.com/r/46012). With Chunkhost I get 1GB of RAM for under $5/month by paying yearly and via bitcoin (I use [Coinbase](https://www.coinbase.com/join/526d7fc9d296a258e800005c) to purchase and manage Bitcoins). In comparison, Digital Ocean offers 512MB of RAM for $5/month. With the extra overhead from Chunkhost, I can easily host multiple apps on the same box. Plus, I've found that the two node apps I have running are both only using \~50MB of RAM\!
 
 ## Sysadmin
 

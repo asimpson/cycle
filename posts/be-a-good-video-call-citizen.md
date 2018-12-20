@@ -16,8 +16,4 @@ There you have it, my top three tips for video calls. Do you have any other tips
 
 ## Replies
 
-> [@a\_simpson](https://twitter.com/a_simpson) These are great\! I'd add:  
-> • Go to a quiet env if possible. If not, liberally use mute  
-> • Use headphones (echoing is no good)
-> 
-> — Aaron Bushnell (@aaronbushnell) [March 17, 2017](https://twitter.com/aaronbushnell/status/842754802190864384)
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">These are great! I&#39;d add:<br>• Go to a quiet env if possible. If not, liberally use mute<br>• Use headphones (echoing is no good)</p>&mdash; Aaron Bushnell (@aaronbushnell) <a href="https://twitter.com/aaronbushnell/status/842754802190864384?ref_src=twsrc%5Etfw">March 17, 2017</a></blockquote>

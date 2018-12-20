@@ -4,6 +4,6 @@ While taking a short break today, I flipped over to [Robin Sloan's interview on 
 
 I totally identify with his analogy, and would wager most "jumbo jets" feel the same way. I think this ties into why I agree so strongly with [Alex Sexton's tweet](https://twitter.com/SlexAxton/status/177127432749461504) from earlier this year (hat-tip to [Motherfuton](https://twitter.com/motherfuton/status/177173995840479233) for the RT),
 
-> I think being skilled at debugging is probably more important than being skilled at coding.
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">I think being skilled at debugging is probably more important than being skilled at coding.</p>&mdash; Alex Sexton (@SlexAxton) <a href="https://twitter.com/SlexAxton/status/177127432749461504?ref_src=twsrc%5Etfw">March 6, 2012</a></blockquote>
 
 Programming is problem-solving, hence my constant dips into [Stackoverflow](http://stackoverflow.com/) and Google. To extend Mr. Sloan's analogy a bit more, even Jumbo Jets need maintenance and fuel.

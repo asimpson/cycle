@@ -31,31 +31,15 @@
     <meta name="twitter:site" content="@a_simpson" />
     <meta name="twitter:title" content="${title}" />
     <meta name="twitter:description" content="${desc}" />
-    <link rel='canonical' href='https://adamsimpson.net/writing/{{link}}'>
+    <link rel='canonical' href='https://adamsimpson.net/writing/{{lik}}'>
     <style>
       {{css}}
     </style>
   </head>
   <body>
-    {{{content}}}
+    {{> post_body}}
     <footer>
       <script async defer src="/js/twitter-widget.js"></script>
-      <script>
-        if (document.querySelectorAll) {
-          const $$ = (ele) => document.querySelectorAll(ele);
-
-          if ($$('pre').length > 0) {
-            $$('pre').forEach(x => {
-              const codeFrag = document.createElement('code');
-              const langClass = x.className;
-              codeFrag.innerHTML = x.innerHTML;
-              x.innerHTML = '';
-              x.appendChild(codeFrag);
-              x.querySelectorAll('code')[0].classList.add(langClass);
-            });
-          }
-        }
-      </script>
       <script defer src="/js/175bd518.prism.js"></script>
       <!-- <script defer src="/js/${assets().search}"></script> -->
     </footer>

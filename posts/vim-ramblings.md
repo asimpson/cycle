@@ -2,9 +2,7 @@ So, in the past 6 months [I've switched from Sublime Text to Vim](https://github
 
 And just like that I've fulfilled [Harry Robert's](http://twitter.com/csswizardry) tweet:
 
-> How do you spot a Vim user? Oh, don’t worry, they’ll let you know.
-> 
-> — Harry Roberts (@csswizardry) [June 24, 2014](https://twitter.com/csswizardry/statuses/481468881400528896)
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">How do you spot a Vim user?<br><br>Oh, don’t worry, they’ll let you know.</p>&mdash; Harry Roberts (@csswizardry) <a href="https://twitter.com/csswizardry/status/481468881400528896?ref_src=twsrc%5Etfw">June 24, 2014</a></blockquote>
 
 Whelp. Anyway, onwards and upwards I guess.
 

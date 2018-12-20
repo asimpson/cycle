@@ -10,6 +10,4 @@ Crafting a high-performing web experience for mobile is not easy, but it's not s
 
 **Update:**
 
-> Sorry, last tweet ate the image link. Here’s why Instant Articles is so much faster. [pic.twitter.com/e3Iyv5r58C](http://t.co/e3Iyv5r58C)
-> 
-> — Adam Simpson (@a\_simpson) [May 14, 2015](https://twitter.com/a_simpson/status/598861478893072385)
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Sorry, last tweet ate the image link. Here’s why Instant Articles is so much faster. <a href="http://t.co/e3Iyv5r58C">pic.twitter.com/e3Iyv5r58C</a></p>&mdash; Adam Simpson (@a_simpson) <a href="https://twitter.com/a_simpson/status/598861478893072385?ref_src=twsrc%5Etfw">May 14, 2015</a></blockquote>

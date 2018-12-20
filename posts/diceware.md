@@ -1,8 +1,6 @@
 Glenn Fleishman ([@GlennF](https://twitter.com/GlennF)) recently linked to a method for generating *passphrases* called [Diceware](https://en.m.wikipedia.org/wiki/Diceware).
 
-> [@craigmod](https://twitter.com/craigmod) Switch to diceware-style ones, if you haven’t. It’s so goddamn much easier, even with 2x the characters of a random one.
-> 
-> — Glenn Fleishman (@GlennF) [March 24, 2017](https://twitter.com/GlennF/status/845101244368601088)
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Switch to diceware-style ones, if you haven’t. It’s so goddamn much easier, even with 2x the characters of a random one.</p>&mdash; Glenn Fleishman (@GlennF) <a href="https://twitter.com/GlennF/status/845101244368601088?ref_src=twsrc%5Etfw">March 24, 2017</a></blockquote>
 
 Being a fan of dice (d20 for life) I thought this was super cool and worth sharing.
 
