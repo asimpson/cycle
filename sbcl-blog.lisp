@@ -11,6 +11,7 @@
 (ql:quickload "3bmd")
 (ql:quickload "3bmd-ext-code-blocks")
 (ql:quickload "cl-fad")
+(ql:quickload "chronicity")
 
 (use-package :sqlite)
 (use-package :json)
@@ -67,6 +68,13 @@
         (ensure-directories-exist (str:concat (full-path-as-string "site/") folder)))
       folder)))
 
+(defun parse-date(date)
+  (let* ((parsed (chronicity:parse date))
+         (month (write-to-string (chronicity:month-of parsed)))
+         (year (write-to-string (chronicity:year-of parsed)))
+         (day (write-to-string (chronicity:day-of parsed))))
+    (str:concat month "/" day "/" year)))
+
 (defun gen-posts()
   "Generate posts from post data, templates, and css file(s)."
   (let ((data (gen-data))
@@ -82,6 +90,10 @@
          (setq post (with-output-to-string (p)
                       (3bmd:parse-string-and-print-to-stream (uiop:read-file-string (str:concat "posts/" (cdr (assoc :slug pair)) ".md")) p)))
          (setq rendered (mustache:render* template `((:content . ,post)
+                                                     (:pub_date . ,(cdr (assoc :published pair)))
+                                                     (:mod_date . ,(cdr (assoc :modified pair)))
+                                                     (:modifiedDate . ,(parse-date (cdr (assoc :modified pair))))
+                                                     (:formattedDate . ,(parse-date (cdr (assoc :published pair))))
                                                      (:link . ,(cdr (assoc :slug pair)))
                                                      (:css . ,css)
                                                      (:title . ,(cdr (assoc :title pair))))))

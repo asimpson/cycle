@@ -2,13 +2,15 @@
   <article class="h-entry pl-max-width">
     <div class="sp_top">
       <h1 class="p-name tx-title sp_none">{{title}}</h1>
-      <!-- <div class="post-date post-date__full-post"> -->
-        <!-- <time class="dt-published" dateTime={this.props.data.pub_date}>{formattedDate}</time> -->
-        <!-- <div class="post-modified-date"> -->
-        <!-- Last Modified: -->
-        <!-- <time class="modified-date dt-updated" dateTime={this.props.data.mod_date}>{modifiedDate}</time> -->
-        <!-- </div> -->
-      <!-- </div> -->
+      <div class="post-date post-date__full-post">
+        <div>
+        Published: <time class="dt-published" datetime={{pub_date}}>{{formattedDate}}</time>
+        </div>
+        <div class="post-modified-date">
+          Last Modified:
+          <time class="modified-date dt-updated" datetime={{mod_date}}>{{modifiedDate}}</time>
+        </div>
+      </div>
       <div class="e-content">
         {{{content}}}
       </div>
