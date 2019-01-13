@@ -1,10 +1,17 @@
 ;;;; sbcl-blog.asd
 
-(asdf:defsystem #:sbcl-blog
-  :description "Describe sbcl-blog here"
-  :author "Your Name <your.name@example.com>"
-  :license "Specify license here"
+(asdf:defsystem :sbcl-blog
+  :description "The static site builder for adamsimpson.net"
+  :author "Adam Simpson <adam@adamsimpson.net>"
+  :license "MIT"
   :serial t
+  :depends-on (:cl-mustache
+               :sqlite
+               :cl-json
+               :str
+               :3bmd
+               :3bmd-ext-code-blocks
+               :cl-fad
+               :chronicity)
   :components ((:file "package")
                (:file "sbcl-blog")))
-

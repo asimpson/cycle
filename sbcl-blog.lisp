@@ -1,20 +1,7 @@
 ;;;; sbcl-blog.lisp
-
-(in-package #:sbcl-blog)
-
-;;; "sbcl-blog" goes here. Hacks and glory await!
 (require "asdf")
-(ql:quickload "cl-mustache")
-(ql:quickload "sqlite")
-(ql:quickload "cl-json")
-(ql:quickload "str")
-(ql:quickload "3bmd")
-(ql:quickload "3bmd-ext-code-blocks")
-(ql:quickload "cl-fad")
-(ql:quickload "chronicity")
 
-(use-package :sqlite)
-(use-package :json)
+(in-package :sbcl-blog)
 
 (defvar *db* (connect "BLOG"))
 
@@ -101,3 +88,7 @@
           :direction :output
           :if-exists :supersede)
         (write-sequence rendered x)))))
+
+(defun main()
+  (copy-public)
+  (gen-posts))
