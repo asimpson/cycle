@@ -122,6 +122,7 @@
                         page)))))
 
 (defun gen-pagination-for-archive(index limit)
+  "Given INDEX and LIMIT this will return an alist of values for pagination."
   (cond
     ((eq index 1)
      '((:next . 2)))
@@ -136,6 +137,7 @@
   (< (cdr one) (cdr two)))
 
 (defun main()
+  "The pipeline to build the site."
   (copy-public)
   (gen-archive)
   (gen-posts))
