@@ -11,7 +11,11 @@
          (formatted (mapcar (lambda(file) `(,file . ,(file-basename file))) files)))
     (loop for file in formatted
        do
-         (uiop:launch-program (str:concat "/usr/local/bin/pandoc " (uiop:unix-namestring (car file)) " -t gfm --wrap=none -o posts/" (cdr file) ".md")))))
+         (uiop:launch-program (str:concat "/usr/local/bin/pandoc "
+                                          (uiop:unix-namestring (car file))
+                                          " -t gfm --wrap=none -o posts/"
+                                          (cdr file)
+                                          ".md")))))
 
 (defun gen-data()
   "Read markdown posts from 'posts' dir and retrieve data from each matching json file."
@@ -43,7 +47,9 @@
   (ensure-directories-exist "site/")
   (dolist (file files)
     (multiple-value-bind (key parts name) (uiop/pathname:split-unix-namestring-directory-components (namestring file))
-      (cl-fad:copy-file file (str:concat (full-path-as-string "site/") (return-public-child-dir parts) name) :overwrite t)))))
+      (cl-fad:copy-file file (str:concat (full-path-as-string "site/")
+                                         (return-public-child-dir parts)
+                                         name) :overwrite t)))))
 
 (defun return-public-child-dir(dir)
   (let ((folder (str:concat (car (last dir)) "/")))
@@ -79,7 +85,9 @@
     (loop for pair in data
        do
          (setf post (with-output-to-string (p)
-                      (3bmd:parse-string-and-print-to-stream (uiop:read-file-string (str:concat "posts/" (cdr (assoc :slug pair)) ".md")) p)))
+                      (3bmd:parse-string-and-print-to-stream
+                       (uiop:read-file-string (str:concat "posts/" (cdr (assoc :slug pair)) ".md"))
+                       p)))
          (setf rendered (mustache:render* template `((:content . ,post)
                                                      (:pub_date . ,(cdr (assoc :published pair)))
                                                      (:mod_date . ,(cdr (assoc :modified pair)))
@@ -110,15 +118,18 @@
                                  (write-to-string (+ 1 i))
                                  ".html"))
           (setf pagination (gen-pagination-for-archive (+ i 1) times))
-          (when (= i
-                   (- times 1))
+          (when (= i (- times 1))
             (write-file (mustache:render* template
-                                          `( ,@pagination (:posts . ,(subseq posts (* i limit)))))
+                                          `( ,@pagination (:posts . ,(subseq
+                                                                      posts
+                                                                      (* i limit)))))
                         page))
-          (when (< i
-                   (- times 1))
+          (when (< i (- times 1))
             (write-file (mustache:render* template
-                                          `( ,@pagination (:posts . ,(subseq posts (* i limit) (+ (* i limit) limit)))))
+                                          `( ,@pagination (:posts . ,(subseq
+                                                                      posts
+                                                                      (* i limit)
+                                                                      (+ (* i limit) limit)))))
                         page)))))
 
 (defun gen-pagination-for-archive(index limit)
@@ -147,14 +158,13 @@
         (template (uiop:read-file-string "templates/page.mustache"))
         data
         content)
-
       (dolist (page pages)
-        (setf data (json:decode-json-from-string (uiop:read-file-string (str:concat "pages/"
-                                                                                    (file-basename page)
-                                                                                    ".json"))))
+        (setf data (json:decode-json-from-string (uiop:read-file-string
+                                                  (str:concat "pages/"
+                                                              (file-basename page)
+                                                              ".json"))))
         (setf content (with-output-to-string (p)
                         (3bmd:parse-string-and-print-to-stream (uiop:read-file-string page) p)))
-
         (ensure-directories-exist (str:concat "site/" (cdr (assoc :permalink data))))
         (write-file (mustache:render* template `( ,@data (:content . ,content)))
                     (str:concat "site/" (cdr (assoc :permalink data)) ".html")))))
