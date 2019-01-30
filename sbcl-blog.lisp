@@ -11,7 +11,7 @@
          (formatted (mapcar (lambda(file) `(,file . ,(file-basename file))) files)))
     (loop for file in formatted
        do
-         (uiop:launch-program (str:concat "/usr/local/bin/pandoc "
+         (uiop:launch-program (concatenate 'string "/usr/local/bin/pandoc "
                                           (uiop:unix-namestring (car file))
                                           " -t gfm --wrap=none -o posts/"
                                           (cdr file)
@@ -22,7 +22,7 @@
   (let* ((posts (uiop:directory-files "posts/" "*.md"))
          (struct (mapcar
                   (lambda(post)
-                    (list post (car (uiop:directory-files "posts/" (str:concat
+                    (list post (car (uiop:directory-files "posts/" (concatenate 'string
                                                                     (file-basename post)
                                                                     ".json"))))) posts)))
     (mapcar #'parse-post struct)))
@@ -47,15 +47,15 @@
   (ensure-directories-exist "site/")
   (dolist (file files)
     (multiple-value-bind (key parts name) (uiop/pathname:split-unix-namestring-directory-components (namestring file))
-      (uiop:copy-file file (str:concat (full-path-as-string "site/")
+      (uiop:copy-file file (concatenate 'string (full-path-as-string "site/")
                                          (return-public-child-dir parts)
                                          name))))))
 
 (defun return-public-child-dir(dir)
-  (let ((folder (str:concat (car (last dir)) "/")))
+  (let ((folder (concatenate 'string (car (last dir)) "/")))
     (unless (equal folder "public/")
-      (unless (uiop/filesystem:directory-exists-p (str:concat "site/" folder))
-        (ensure-directories-exist (str:concat (full-path-as-string "site/") folder)))
+      (unless (uiop/filesystem:directory-exists-p (concatenate 'string "site/" folder))
+        (ensure-directories-exist (concatenate 'string (full-path-as-string "site/") folder)))
       folder)))
 
 (defun parse-date(date)
@@ -63,7 +63,7 @@
          (month (write-to-string (chronicity:month-of parsed)))
          (year (write-to-string (chronicity:year-of parsed)))
          (day (write-to-string (chronicity:day-of parsed))))
-    (str:concat month "/" day "/" year)))
+    (concatenate 'string month "/" day "/" year)))
 
 (defun write-file(contents file)
   "Write CONTENTS to FILE."
@@ -86,7 +86,11 @@
        do
          (setf post (with-output-to-string (p)
                       (3bmd:parse-string-and-print-to-stream
-                       (uiop:read-file-string (str:concat "posts/" (cdr (assoc :slug pair)) ".md"))
+                       (uiop:read-file-string (concatenate
+                                               'string
+                                               "posts/"
+                                               (cdr (assoc :slug pair))
+                                               ".md"))
                        p)))
          (setf rendered (mustache:render* template `((:content . ,post)
                                                      (:pub_date . ,(cdr (assoc :published pair)))
@@ -96,7 +100,11 @@
                                                      (:link . ,(cdr (assoc :slug pair)))
                                                      (:css . ,css)
                                                      (:title . ,(cdr (assoc :title pair))))))
-          (write-file rendered (str:concat "site/writing/" (cdr (assoc :slug pair)) ".html")))))
+          (write-file rendered (concatenate
+                                'string
+                                "site/writing/"
+                                (cdr (assoc :slug pair))
+                                ".html")))))
 
 (defun gen-archive()
   "Create archive type pages."
@@ -108,16 +116,17 @@
                                'sort-by-ids
                                :key 'car)))
          (times (+ (floor (length posts) limit) 1))
-         (path (str:concat "site" (cdr (assoc :path data))))
+         (path (concatenate 'string "site" (cdr (assoc :path data))))
          page
          pagination)
     (ensure-directories-exist path)
     ;;refactor to use dotimes
     (loop for i upto times
           do
-          (setf page (str:concat path
-                                 (write-to-string (+ 1 i))
-                                 ".html"))
+          (setf page (concatenate 'string
+                                  path
+                                  (write-to-string (+ 1 i))
+                                  ".html"))
           (setf pagination (gen-pagination-for-archive (+ i 1) times))
           (when (= i (- times 1))
             (write-file (mustache:render* template
@@ -150,7 +159,7 @@
 
 (defun file-basename (path)
   "Return the file name without extension for PATH."
-  (car (str:split-omit-nulls "." (file-namestring path))))
+  (car (uiop:split-string (file-namestring path) :separator ".")))
 
 (defun gen-pages()
   "Generate any markdown files in the pages/ dir using matching JSON files as context."
@@ -162,14 +171,15 @@
         content)
       (dolist (page pages)
         (setf data (json:decode-json-from-string (uiop:read-file-string
-                                                  (str:concat "pages/"
-                                                              (file-basename page)
-                                                              ".json"))))
+                                                  (concatenate 'string
+                                                               "pages/"
+                                                               (file-basename page)
+                                                               ".json"))))
         (setf content (with-output-to-string (p)
                         (3bmd:parse-string-and-print-to-stream (uiop:read-file-string page) p)))
-        (ensure-directories-exist (str:concat "site/" (cdr (assoc :permalink data))))
+        (ensure-directories-exist (concatenate 'string "site/" (cdr (assoc :permalink data))))
         (write-file (mustache:render* template `( ,css ,@data (:content . ,content)))
-                    (str:concat "site/" (cdr (assoc :permalink data)) ".html")))))
+                    (concatenate 'string "site/" (cdr (assoc :permalink data)) ".html")))))
 
 (defun main()
   "The pipeline to build the site."
@@ -179,6 +189,5 @@
   ;;build rss feed
   ;;build sitemap
   ;;desssssssign
-  ;;prune deps
   ;;iframe service for tweets, very minimal JS
   (gen-posts))

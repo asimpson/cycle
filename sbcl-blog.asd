@@ -8,7 +8,6 @@
   :depends-on (:cl-mustache
                :sqlite
                :cl-json
-               :str
                :3bmd
                :3bmd-ext-code-blocks
                :chronicity)
