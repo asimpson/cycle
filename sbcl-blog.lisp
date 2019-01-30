@@ -69,10 +69,10 @@
 (defun gen-posts()
   "Generate posts from post data, templates, and css file(s)."
   (let ((data (gen-data))
-        (template (uiop:read-file-string "templates/post.hbs"))
+        (template (uiop:read-file-string "templates/post.mustache"))
         (css (uiop:read-file-string "site.css"))
         (3bmd-code-blocks:*code-blocks* t)
-        (mustache:*default-pathname-type* "hbs")
+        (mustache:*default-pathname-type* "mustache")
         (mustache:*load-path* (list (namestring (car (uiop:subdirectories "./templates")))))
         post
         rendered)
@@ -88,11 +88,11 @@
                                                      (:link . ,(cdr (assoc :slug pair)))
                                                      (:css . ,css)
                                                      (:title . ,(cdr (assoc :title pair))))))
-          (write-file rendered (str:concat "site/" (cdr (assoc :slug pair)) ".html")))))
+          (write-file rendered (str:concat "site/writing/" (cdr (assoc :slug pair)) ".html")))))
 
 (defun gen-archive()
   "Create archive type pages."
-  (let* ((template (uiop:read-file-string "pages/archive.hbs"))
+  (let* ((template (uiop:read-file-string "pages/archive.mustache"))
          (data (json:decode-json-from-string (uiop:read-file-string "pages/archive.json")))
          (limit (cdr (assoc :paginate data)))
          (posts (reverse (sort (gen-data)
