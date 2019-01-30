@@ -11,7 +11,6 @@
                :str
                :3bmd
                :3bmd-ext-code-blocks
-               :cl-fad
                :chronicity)
   :components ((:file "package")
                (:file "sbcl-blog")))

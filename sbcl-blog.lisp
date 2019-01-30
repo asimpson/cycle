@@ -47,9 +47,9 @@
   (ensure-directories-exist "site/")
   (dolist (file files)
     (multiple-value-bind (key parts name) (uiop/pathname:split-unix-namestring-directory-components (namestring file))
-      (cl-fad:copy-file file (str:concat (full-path-as-string "site/")
+      (uiop:copy-file file (str:concat (full-path-as-string "site/")
                                          (return-public-child-dir parts)
-                                         name) :overwrite t)))))
+                                         name))))))
 
 (defun return-public-child-dir(dir)
   (let ((folder (str:concat (car (last dir)) "/")))
