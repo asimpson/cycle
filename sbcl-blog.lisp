@@ -8,7 +8,7 @@
 (defun gen-md()
   "One-off command to turn html files into md files via pandco process."
   (let* ((files (uiop:directory-files "posts/" "*.html"))
-         (formatted (mapcar (lambda(file) `(,file . ,(car (str:split-omit-nulls "." (file-namestring file))))) files)))
+         (formatted (mapcar (lambda(file) `(,file . ,(file-basename file))) files)))
     (loop for file in formatted
        do
          (uiop:launch-program (str:concat "/usr/local/bin/pandoc " (uiop:unix-namestring (car file)) " -t gfm --wrap=none -o posts/" (cdr file) ".md")))))
@@ -19,7 +19,7 @@
          (struct (mapcar
                   (lambda(post)
                     (list post (car (uiop:directory-files "posts/" (str:concat
-                                                                    (car (str:split-omit-nulls "." (file-namestring post)))
+                                                                    (file-basename post)
                                                                     ".json"))))) posts)))
     (mapcar #'parse-post struct)))
 
@@ -78,9 +78,9 @@
         rendered)
     (loop for pair in data
        do
-         (setq post (with-output-to-string (p)
+         (setf post (with-output-to-string (p)
                       (3bmd:parse-string-and-print-to-stream (uiop:read-file-string (str:concat "posts/" (cdr (assoc :slug pair)) ".md")) p)))
-         (setq rendered (mustache:render* template `((:content . ,post)
+         (setf rendered (mustache:render* template `((:content . ,post)
                                                      (:pub_date . ,(cdr (assoc :published pair)))
                                                      (:mod_date . ,(cdr (assoc :modified pair)))
                                                      (:modifiedDate . ,(parse-date (cdr (assoc :modified pair))))
@@ -136,8 +136,37 @@
 (defun sort-by-ids (one two)
   (< (cdr one) (cdr two)))
 
+(defun file-basename (path)
+  "Return the file name without extension for PATH."
+  (car (str:split-omit-nulls "." (file-namestring path))))
+
+(defun gen-pages()
+  "Generate any markdown files in the pages/ dir using matching JSON files as context."
+  (let ((pages (uiop:directory-files "pages/" "*.md"))
+        (3bmd-code-blocks:*code-blocks* t)
+        (template (uiop:read-file-string "templates/page.mustache"))
+        data
+        content)
+
+      (dolist (page pages)
+        (setf data (json:decode-json-from-string (uiop:read-file-string (str:concat "pages/"
+                                                                                    (file-basename page)
+                                                                                    ".json"))))
+        (setf content (with-output-to-string (p)
+                        (3bmd:parse-string-and-print-to-stream (uiop:read-file-string page) p)))
+
+        (ensure-directories-exist (str:concat "site/" (cdr (assoc :permalink data))))
+        (write-file (mustache:render* template `( ,@data (:content . ,content)))
+                    (str:concat "site/" (cdr (assoc :permalink data)) ".html")))))
+
 (defun main()
   "The pipeline to build the site."
   (copy-public)
   (gen-archive)
+  (gen-pages)
+  ;;build rss feed
+  ;;build sitemap
+  ;;desssssssign
+  ;;prune deps
+  ;;iframe service for tweets, very minimal JS
   (gen-posts))
