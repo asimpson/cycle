@@ -95,18 +95,42 @@
   (let* ((template (uiop:read-file-string "pages/archive.hbs"))
          (data (json:decode-json-from-string (uiop:read-file-string "pages/archive.json")))
          (limit (cdr (assoc :paginate data)))
-         (posts (reverse (sort (gen-data) 'sort-by-ids :key 'car)))
+         (posts (reverse (sort (gen-data)
+                               'sort-by-ids
+                               :key 'car)))
          (times (+ (floor (length posts) limit) 1))
-         (path (str:concat "site/" (cdr (assoc :path data))))
-         page)
+         (path (str:concat "site" (cdr (assoc :path data))))
+         page
+         pagination)
     (ensure-directories-exist path)
+    ;;refactor to use dotimes
     (loop for i upto times
           do
-          (setq page (str:concat path (write-to-string (+ 1 i)) ".html"))
-          (when (= i (- times 1))
-            (write-file (mustache:render* template `((:prev . ,(- i 1)) (:posts . ,(subseq posts (* i limit))))) page))
-          (when (< i (- times 1))
-            (write-file (mustache:render* template `((:prev . ,(- i 1)) (:next . ,(+ i 1)) (:posts . ,(subseq posts (* i limit) (+ (* i limit) limit))))) page)))))
+          (setf page (str:concat path
+                                 (write-to-string (+ 1 i))
+                                 ".html"))
+          (setf pagination (gen-pagination-for-archive (+ i 1) times))
+          (when (= i
+                   (- times 1))
+            (write-file (mustache:render* template
+                                          `( ,@pagination (:posts . ,(subseq posts (* i limit)))))
+                        page))
+          (when (< i
+                   (- times 1))
+            (write-file (mustache:render* template
+                                          `( ,@pagination (:posts . ,(subseq posts (* i limit) (+ (* i limit) limit)))))
+                        page)))))
+
+(defun gen-pagination-for-archive(index limit)
+  (cond
+    ((eq index 1)
+     '((:next . 2)))
+    ((eq index limit)
+     `((:prev . ,(- index 1))))
+    ((> index limit)
+     '())
+    (t
+     `((:prev . ,(- index 1)) (:next . ,(+ index 1))))))
 
 (defun sort-by-ids (one two)
   (< (cdr one) (cdr two)))
