@@ -102,6 +102,7 @@
   "Create archive type pages."
   (let* ((template (uiop:read-file-string "pages/archive.mustache"))
          (data (json:decode-json-from-string (uiop:read-file-string "pages/archive.json")))
+         (css `(:css . ,(uiop:read-file-string "site.css")))
          (limit (cdr (assoc :paginate data)))
          (posts (reverse (sort (gen-data)
                                'sort-by-ids
@@ -120,13 +121,13 @@
           (setf pagination (gen-pagination-for-archive (+ i 1) times))
           (when (= i (- times 1))
             (write-file (mustache:render* template
-                                          `( ,@pagination (:posts . ,(subseq
+                                          `( ,css ,@pagination (:posts . ,(subseq
                                                                       posts
                                                                       (* i limit)))))
                         page))
           (when (< i (- times 1))
             (write-file (mustache:render* template
-                                          `( ,@pagination (:posts . ,(subseq
+                                          `( ,css ,@pagination (:posts . ,(subseq
                                                                       posts
                                                                       (* i limit)
                                                                       (+ (* i limit) limit)))))
@@ -155,6 +156,7 @@
   "Generate any markdown files in the pages/ dir using matching JSON files as context."
   (let ((pages (uiop:directory-files "pages/" "*.md"))
         (3bmd-code-blocks:*code-blocks* t)
+        (css `(:css . ,(uiop:read-file-string "site.css")))
         (template (uiop:read-file-string "templates/page.mustache"))
         data
         content)
@@ -166,7 +168,7 @@
         (setf content (with-output-to-string (p)
                         (3bmd:parse-string-and-print-to-stream (uiop:read-file-string page) p)))
         (ensure-directories-exist (str:concat "site/" (cdr (assoc :permalink data))))
-        (write-file (mustache:render* template `( ,@data (:content . ,content)))
+        (write-file (mustache:render* template `( ,css ,@data (:content . ,content)))
                     (str:concat "site/" (cdr (assoc :permalink data)) ".html")))))
 
 (defun main()
