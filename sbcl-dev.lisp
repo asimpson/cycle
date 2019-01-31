@@ -5,7 +5,7 @@
 
 (defvar *db* (sqlite:connect "BLOG"))
 
-(defun gen-md()
+(defun gen-md ()
   "One-off command to turn html files into md files via pandco process."
   (let* ((files (uiop:directory-files "posts/" "*.html"))
          (formatted (mapcar (lambda(file) `(,file . ,(sbcl-blog:file-basename file))) files)))
@@ -17,7 +17,7 @@
                                           (cdr file)
                                           ".md")))))
 
-(defun write-posts-to-file()
+(defun write-posts-to-file ()
   "This grabs the raw data out of the db and writes it to HTML files."
   (let ((posts (sqlite:execute-to-list *db* "select id,slug,title,pub_date,mod_date,excerpt,content from posts")))
     (loop for post in posts

@@ -3,7 +3,7 @@
 
 (in-package :sbcl-blog)
 
-(defun gen-data()
+(defun gen-data ()
   "Read markdown posts from 'posts' dir and retrieve data from each matching json file."
   (let* ((posts (uiop:directory-files "posts/" "*.md"))
          (struct (mapcar
@@ -13,15 +13,15 @@
                                                                     ".json"))))) posts)))
     (mapcar #'parse-post struct)))
 
-(defun parse-post(post)
+(defun parse-post (post)
   "Convert json data to list."
   (let ((json (uiop:read-file-string (car (cdr post)))))
     (json:decode-json-from-string json)))
 
-(defun full-path-as-string(dir)
+(defun full-path-as-string (dir)
   (namestring (truename dir)))
 
-(defun copy-public()
+(defun copy-public ()
   (let ((files (uiop:directory-files "public/**/")))
   (ensure-directories-exist "site/")
   (dolist (file files)
@@ -30,28 +30,28 @@
                                          (return-public-child-dir parts)
                                          name))))))
 
-(defun return-public-child-dir(dir)
+(defun return-public-child-dir (dir)
   (let ((folder (concatenate 'string (car (last dir)) "/")))
     (unless (equal folder "public/")
       (unless (uiop/filesystem:directory-exists-p (concatenate 'string "site/" folder))
         (ensure-directories-exist (concatenate 'string (full-path-as-string "site/") folder)))
       folder)))
 
-(defun parse-date(date)
+(defun parse-date (date)
   (let* ((parsed (chronicity:parse date))
          (month (write-to-string (chronicity:month-of parsed)))
          (year (write-to-string (chronicity:year-of parsed)))
          (day (write-to-string (chronicity:day-of parsed))))
     (concatenate 'string month "/" day "/" year)))
 
-(defun write-file(contents file)
+(defun write-file (contents file)
   "Write CONTENTS to FILE."
   (with-open-file (stream file
                      :direction :output
                      :if-exists :supersede)
     (write-sequence contents stream)))
 
-(defun gen-posts()
+(defun gen-posts ()
   "Generate posts from post data, templates, and css file(s)."
   (let ((data (gen-data))
         (template (uiop:read-file-string "templates/post.mustache"))
@@ -85,7 +85,7 @@
                                 (cdr (assoc :slug pair))
                                 ".html")))))
 
-(defun gen-archive()
+(defun gen-archive ()
   "Create archive type pages."
   (let* ((template (uiop:read-file-string "pages/archive.mustache"))
          (data (json:decode-json-from-string (uiop:read-file-string "pages/archive.json")))
@@ -121,7 +121,7 @@
                                                                            (+ (* i limit) limit)))))
                         page)))))
 
-(defun gen-pagination-for-archive(index limit)
+(defun gen-pagination-for-archive (index limit)
   "Given INDEX and LIMIT this will return an alist of values for pagination."
   (cond
     ((eq index 1)
@@ -140,7 +140,7 @@
   "Return the file name without extension for PATH."
   (car (uiop:split-string (file-namestring path) :separator ".")))
 
-(defun gen-pages()
+(defun gen-pages ()
   "Generate any markdown files in the pages/ dir using matching JSON files as context."
   (let ((pages (uiop:directory-files "pages/" "*.md"))
         (3bmd-code-blocks:*code-blocks* t)
@@ -160,7 +160,7 @@
         (write-file (mustache:render* template `( ,css ,@data (:content . ,content)))
                     (concatenate 'string "site/" (cdr (assoc :permalink data)) ".html")))))
 
-(defun main()
+(defun main ()
   "The pipeline to build the site."
   (copy-public)
   (gen-archive)
