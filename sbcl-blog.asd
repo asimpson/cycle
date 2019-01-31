@@ -5,11 +5,11 @@
   :author "Adam Simpson <adam@adamsimpson.net>"
   :license "MIT"
   :serial t
-  :depends-on (:cl-mustache
-               :sqlite
-               :cl-json
-               :3bmd
-               :3bmd-ext-code-blocks
-               :chronicity)
+  :depends-on (
+    :chronicity
+    :cl-json
+    :cl-mustache
+    :3bmd
+    :3bmd-ext-code-blocks)
   :components ((:file "package")
                (:file "sbcl-blog")))

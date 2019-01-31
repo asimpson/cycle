@@ -1,3 +1,3 @@
-This is the stub README.txt for the "sbcl-blog" project.
+* Compile binary
 
-sbcl --load "sbcl-blog.asd" --eval "(ql:quickload :sbcl-blog)" --eval "(sb-ext:save-lisp-and-die \"foo\" :toplevel 'sbcl-blog:main :executable t)"
+~sbcl --load "sbcl-blog.asd" --eval "(ql:quickload :sbcl-blog)" --eval "(sb-ext:save-lisp-and-die \"foo\" :toplevel 'sbcl-blog:main :executable t :compression 9)"~

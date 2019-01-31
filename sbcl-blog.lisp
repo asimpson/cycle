@@ -3,20 +3,6 @@
 
 (in-package :sbcl-blog)
 
-(defvar *db* (connect "BLOG"))
-
-(defun gen-md()
-  "One-off command to turn html files into md files via pandco process."
-  (let* ((files (uiop:directory-files "posts/" "*.html"))
-         (formatted (mapcar (lambda(file) `(,file . ,(file-basename file))) files)))
-    (loop for file in formatted
-       do
-         (uiop:launch-program (concatenate 'string "/usr/local/bin/pandoc "
-                                          (uiop:unix-namestring (car file))
-                                          " -t gfm --wrap=none -o posts/"
-                                          (cdr file)
-                                          ".md")))))
-
 (defun gen-data()
   "Read markdown posts from 'posts' dir and retrieve data from each matching json file."
   (let* ((posts (uiop:directory-files "posts/" "*.md"))
@@ -26,13 +12,6 @@
                                                                     (file-basename post)
                                                                     ".json"))))) posts)))
     (mapcar #'parse-post struct)))
-
-(defun write-posts-to-file()
-  "This grabs the raw data out of the db and writes it to HTML files."
-  (let ((posts (execute-to-list *db* "select id,slug,title,pub_date,mod_date,excerpt,content from posts")))
-    (loop for post in posts
-       do
-          (write-file (car (last post)) (concatenate 'string "posts/" (second post) ".html")))))
 
 (defun parse-post(post)
   "Convert json data to list."
@@ -131,15 +110,15 @@
           (when (= i (- times 1))
             (write-file (mustache:render* template
                                           `( ,css ,@pagination (:posts . ,(subseq
-                                                                      posts
-                                                                      (* i limit)))))
+                                                                           posts
+                                                                           (* i limit)))))
                         page))
           (when (< i (- times 1))
             (write-file (mustache:render* template
                                           `( ,css ,@pagination (:posts . ,(subseq
-                                                                      posts
-                                                                      (* i limit)
-                                                                      (+ (* i limit) limit)))))
+                                                                           posts
+                                                                           (* i limit)
+                                                                           (+ (* i limit) limit)))))
                         page)))))
 
 (defun gen-pagination-for-archive(index limit)
