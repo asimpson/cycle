@@ -3,6 +3,12 @@
 
 (in-package :sbcl-blog)
 
+(setf mustache:*load-path* (list (namestring (car (uiop:subdirectories "./templates")))))
+(setf mustache:*default-pathname-type* "mustache")
+(setf 3bmd-code-blocks:*code-blocks* t)
+(defvar css (uiop:read-file-string "site.css")
+  "CSS for the site.")
+
 (defun gen-data ()
   "Read markdown posts from 'posts' dir and retrieve data from each matching json file."
   (let* ((posts (uiop:directory-files "posts/" "*.md"))
@@ -55,10 +61,6 @@
   "Generate posts from post data, templates, and css file(s)."
   (let ((data (gen-data))
         (template (uiop:read-file-string "templates/post.mustache"))
-        (css (uiop:read-file-string "site.css"))
-        (3bmd-code-blocks:*code-blocks* t)
-        (mustache:*default-pathname-type* "mustache")
-        (mustache:*load-path* (list (namestring (car (uiop:subdirectories "./templates")))))
         post
         rendered)
     (loop for pair in data
@@ -77,6 +79,10 @@
                                                      (:modifiedDate . ,(parse-date (cdr (assoc :modified pair))))
                                                      (:formattedDate . ,(parse-date (cdr (assoc :published pair))))
                                                      (:link . ,(cdr (assoc :slug pair)))
+                                                     (:description . ,(cdr (assoc :excerpt pair)))
+                                                     (:slug . ,(concatenate 'string
+                                                                           "/writing/"
+                                                                           (cdr (assoc :slug pair))))
                                                      (:css . ,css)
                                                      (:title . ,(cdr (assoc :title pair))))))
           (write-file rendered (concatenate
@@ -89,7 +95,7 @@
   "Create archive type pages."
   (let* ((template (uiop:read-file-string "pages/archive.mustache"))
          (data (json:decode-json-from-string (uiop:read-file-string "pages/archive.json")))
-         (css `(:css . ,(uiop:read-file-string "site.css")))
+         (css `(:css . ,css))
          (limit (cdr (assoc :paginate data)))
          (posts (reverse (sort (gen-data)
                                'sort-by-ids
@@ -97,7 +103,8 @@
          (times (+ (floor (length posts) limit) 1))
          (path (concatenate 'string "site" (cdr (assoc :path data))))
          page
-         pagination)
+         pagination
+         slug)
     (ensure-directories-exist path)
     ;;refactor to use dotimes
     (loop for i upto times
@@ -106,19 +113,28 @@
                                   path
                                   (write-to-string (+ 1 i))
                                   ".html"))
+          (setf slug (concatenate 'string
+                                  (cdr (assoc :path data))
+                                  (write-to-string (+ i 1))))
           (setf pagination (gen-pagination-for-archive (+ i 1) times))
           (when (= i (- times 1))
             (write-file (mustache:render* template
-                                          `( ,css ,@pagination (:posts . ,(subseq
-                                                                           posts
-                                                                           (* i limit)))))
+                                          `((:slug . ,slug)
+                                            ,css
+                                            ,@pagination
+                                            (:posts . ,(subseq
+                                                        posts
+                                                        (* i limit)))))
                         page))
           (when (< i (- times 1))
             (write-file (mustache:render* template
-                                          `( ,css ,@pagination (:posts . ,(subseq
-                                                                           posts
-                                                                           (* i limit)
-                                                                           (+ (* i limit) limit)))))
+                                          `((:slug . ,slug)
+                                            ,css
+                                            ,@pagination
+                                            (:posts . ,(subseq
+                                                        posts
+                                                        (* i limit)
+                                                        (+ (* i limit) limit)))))
                         page)))))
 
 (defun gen-pagination-for-archive (index limit)
@@ -143,8 +159,7 @@
 (defun gen-pages ()
   "Generate any markdown files in the pages/ dir using matching JSON files as context."
   (let ((pages (uiop:directory-files "pages/" "*.md"))
-        (3bmd-code-blocks:*code-blocks* t)
-        (css `(:css . ,(uiop:read-file-string "site.css")))
+        (css `(:css . ,css))
         (template (uiop:read-file-string "templates/page.mustache"))
         data
         content)
@@ -157,7 +172,10 @@
         (setf content (with-output-to-string (p)
                         (3bmd:parse-string-and-print-to-stream (uiop:read-file-string page) p)))
         (ensure-directories-exist (concatenate 'string "site/" (cdr (assoc :permalink data))))
-        (write-file (mustache:render* template `( ,css ,@data (:content . ,content)))
+        (write-file (mustache:render* template `( (:slug . ,(cdr (assoc :permalink data)))
+                                                  ,css
+                                                  ,@data
+                                                  (:content . ,content)))
                     (concatenate 'string "site/" (cdr (assoc :permalink data)) ".html")))))
 
 (defun main ()
