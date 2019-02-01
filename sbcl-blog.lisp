@@ -13,10 +13,12 @@
   "Read markdown posts from 'posts' dir and retrieve data from each matching json file."
   (let* ((posts (uiop:directory-files "posts/" "*.md"))
          (struct (mapcar
-                  (lambda(post)
-                    (list post (car (uiop:directory-files "posts/" (concatenate 'string
+                  (lambda (post)
+                    (list post (car (uiop:directory-files "posts/" (concatenate
+                                                                    'string
                                                                     (file-basename post)
-                                                                    ".json"))))) posts)))
+                                                                    ".json")))))
+                  posts)))
     (mapcar #'parse-post struct)))
 
 (defun parse-post (post)
@@ -178,13 +180,18 @@
                                                   (:content . ,content)))
                     (concatenate 'string "site/" (cdr (assoc :permalink data)) ".html")))))
 
+(defun gen-rss ()
+)
+
+(defun gen-sitemap ()
+)
+
 (defun main ()
   "The pipeline to build the site."
   (copy-public)
   (gen-archive)
   (gen-pages)
-  ;;build rss feed
-  ;;build sitemap
-  ;;desssssssign
+  (gen-posts)
   ;;iframe service for tweets, very minimal JS
-  (gen-posts))
+  (gen-rss)
+  (gen-sitemap))
