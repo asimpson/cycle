@@ -65,33 +65,32 @@
         (template (uiop:read-file-string "templates/post.mustache"))
         post
         rendered)
-    (loop for pair in data
-       do
-         (setf post (with-output-to-string (p)
-                      (3bmd:parse-string-and-print-to-stream
-                       (uiop:read-file-string (concatenate
-                                               'string
-                                               "posts/"
-                                               (cdr (assoc :slug pair))
-                                               ".md"))
-                       p)))
-         (setf rendered (mustache:render* template `((:content . ,post)
-                                                     (:pub_date . ,(cdr (assoc :published pair)))
-                                                     (:mod_date . ,(cdr (assoc :modified pair)))
-                                                     (:modifiedDate . ,(parse-date (cdr (assoc :modified pair))))
-                                                     (:formattedDate . ,(parse-date (cdr (assoc :published pair))))
-                                                     (:link . ,(cdr (assoc :slug pair)))
-                                                     (:description . ,(cdr (assoc :excerpt pair)))
-                                                     (:slug . ,(concatenate 'string
-                                                                           "/writing/"
-                                                                           (cdr (assoc :slug pair))))
-                                                     (:css . ,css)
-                                                     (:title . ,(cdr (assoc :title pair))))))
-          (write-file rendered (concatenate
-                                'string
-                                "site/writing/"
-                                (cdr (assoc :slug pair))
-                                ".html")))))
+    (dolist (pair data)
+      (setf post (with-output-to-string (p)
+                   (3bmd:parse-string-and-print-to-stream
+                    (uiop:read-file-string (concatenate
+                                            'string
+                                            "posts/"
+                                            (cdr (assoc :slug pair))
+                                            ".md"))
+                    p)))
+      (setf rendered (mustache:render* template `((:content . ,post)
+                                                  (:pub_date . ,(cdr (assoc :published pair)))
+                                                  (:mod_date . ,(cdr (assoc :modified pair)))
+                                                  (:modifiedDate . ,(parse-date (cdr (assoc :modified pair))))
+                                                  (:formattedDate . ,(parse-date (cdr (assoc :published pair))))
+                                                  (:link . ,(cdr (assoc :slug pair)))
+                                                  (:description . ,(cdr (assoc :excerpt pair)))
+                                                  (:slug . ,(concatenate 'string
+                                                                         "/writing/"
+                                                                         (cdr (assoc :slug pair))))
+                                                  (:css . ,css)
+                                                  (:title . ,(cdr (assoc :title pair))))))
+      (write-file rendered (concatenate
+                            'string
+                            "site/writing/"
+                            (cdr (assoc :slug pair))
+                            ".html")))))
 
 (defun gen-archive ()
   "Create archive type pages."
@@ -108,36 +107,34 @@
          pagination
          slug)
     (ensure-directories-exist path)
-    ;;refactor to use dotimes
-    (loop for i upto times
-          do
-          (setf page (concatenate 'string
-                                  path
-                                  (write-to-string (+ 1 i))
-                                  ".html"))
-          (setf slug (concatenate 'string
-                                  (cdr (assoc :path data))
-                                  (write-to-string (+ i 1))))
-          (setf pagination (gen-pagination-for-archive (+ i 1) times))
-          (when (= i (- times 1))
-            (write-file (mustache:render* template
-                                          `((:slug . ,slug)
-                                            ,css
-                                            ,@pagination
-                                            (:posts . ,(subseq
-                                                        posts
-                                                        (* i limit)))))
-                        page))
-          (when (< i (- times 1))
-            (write-file (mustache:render* template
-                                          `((:slug . ,slug)
-                                            ,css
-                                            ,@pagination
-                                            (:posts . ,(subseq
-                                                        posts
-                                                        (* i limit)
-                                                        (+ (* i limit) limit)))))
-                        page)))))
+    (dotimes (i times)
+      (setf page (concatenate 'string
+                              path
+                              (write-to-string (+ 1 i))
+                              ".html"))
+      (setf slug (concatenate 'string
+                              (cdr (assoc :path data))
+                              (write-to-string (+ i 1))))
+      (setf pagination (gen-pagination-for-archive (+ i 1) times))
+      (when (= i (- times 1))
+        (write-file (mustache:render* template
+                                      `((:slug . ,slug)
+                                        ,css
+                                        ,@pagination
+                                        (:posts . ,(subseq
+                                                    posts
+                                                    (* i limit)))))
+                    page))
+      (when (< i (- times 1))
+        (write-file (mustache:render* template
+                                      `((:slug . ,slug)
+                                        ,css
+                                        ,@pagination
+                                        (:posts . ,(subseq
+                                                    posts
+                                                    (* i limit)
+                                                    (+ (* i limit) limit)))))
+                    page)))))
 
 (defun gen-pagination-for-archive (index limit)
   "Given INDEX and LIMIT this will return an alist of values for pagination."
@@ -181,6 +178,8 @@
                     (concatenate 'string "site/" (cdr (assoc :permalink data)) ".html")))))
 
 (defun gen-rss ()
+  (let ((posts (subseq (gen-data) 0 10))
+        (now )
 )
 
 (defun gen-sitemap ()
