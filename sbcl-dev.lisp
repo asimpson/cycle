@@ -21,3 +21,29 @@
   (let ((posts (sqlite:execute-to-list *db* "select id,slug,title,pub_date,mod_date,excerpt,content from posts")))
     (dolist (post posts)
       (sbcl-blog:write-file (car (last post)) (concatenate 'string "posts/" (second post) ".html")))))
+
+
+(defun write-data-to-file()
+  (let ((posts (sqlite:execute-to-list *db* "select id,slug,title,pub_date,mod_date,excerpt from posts")))
+    (dolist (post posts)
+      (sbcl-blog:write-file (data-to-json post) (concatenate 'string "posts/" (second post) ".json")))))
+
+(defun data-to-json(post)
+  (let ((json (json:encode-json-to-string `(
+                                            ("id" . ,(first post))
+                                            ("slug" . ,(second post))
+                                            ("title" . ,(third post))
+                                            ("published" . ,(coerce-tz (fourth post)))
+                                            ("modified" . ,(coerce-tz (fifth post)))
+                                            ("excerpt" . ,(string-trim " " (sixth post)))))))
+    json))
+
+(defun coerce-tz(date)
+  (let* ((no-zone (substitute #\T #\Space date))
+         (digit (parse-integer (car (sbcl-blog:split-string (car (cdr (sbcl-blog:split-string date " "))) ":"))))
+         (parsed-hour (local-time:timestamp-hour (local-time:parse-timestring (concatenate 'string no-zone "-04:00")))))
+    (if (eq parsed-hour digit)
+        (concatenate 'string no-zone "-04:00")
+      (concatenate 'string no-zone "-05:00"))))
+
+(write-data-to-file)

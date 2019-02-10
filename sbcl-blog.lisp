@@ -3,11 +3,34 @@
 
 (in-package :sbcl-blog)
 
-(setf mustache:*load-path* (list (namestring (car (uiop:subdirectories "./templates")))))
+(print "Building site...")
+(setf mustache:*load-path* `(,(namestring (car (uiop:subdirectories "./templates")))))
 (setf mustache:*default-pathname-type* "mustache")
 (setf 3bmd-code-blocks:*code-blocks* t)
 (defvar css (uiop:read-file-string "site.css")
   "CSS for the site.")
+(defvar posts nil "Global posts variable.")
+(defvar days '("Mon" "Tue" "Wed" "Thu" "Fri" "Sat" "Sun"))
+(defvar months '("Jan"
+                 "Feb"
+                 "Mar"
+                 "Apr"
+                 "May"
+                 "Jun"
+                 "Jul"
+                 "Aug"
+                 "Sep"
+                 "Oct"
+                 "Nov"
+                 "Dec"))
+(defvar us-time-zone-codes '((4 . "EDT")
+                           (5 . "EST")
+                           (6 . "CDT")
+                           (7 . "CST")
+                           (8 . "MDT")
+                           (9 . "MST")
+                           (10 . "PDT")
+                           (11 . "PST")))
 
 (defun gen-data ()
   "Read markdown posts from 'posts' dir and retrieve data from each matching json file."
@@ -37,7 +60,6 @@
       (uiop:copy-file file (concatenate 'string (full-path-as-string "site/")
                                          (return-public-child-dir parts)
                                          name))))))
-
 (defun return-public-child-dir (dir)
   (let ((folder (concatenate 'string (car (last dir)) "/")))
     (unless (equal folder "public/")
@@ -59,21 +81,24 @@
                      :if-exists :supersede)
     (write-sequence contents stream)))
 
+(defun post-for-slug (slug)
+  (with-output-to-string (p)
+    (3bmd:parse-string-and-print-to-stream
+     (uiop:read-file-string (concatenate
+                             'string
+                             "posts/"
+                             slug
+                             ".md"))
+     p)))
+
 (defun gen-posts ()
   "Generate posts from post data, templates, and css file(s)."
-  (let ((data (gen-data))
+  (let ((data posts)
         (template (uiop:read-file-string "templates/post.mustache"))
         post
         rendered)
     (dolist (pair data)
-      (setf post (with-output-to-string (p)
-                   (3bmd:parse-string-and-print-to-stream
-                    (uiop:read-file-string (concatenate
-                                            'string
-                                            "posts/"
-                                            (cdr (assoc :slug pair))
-                                            ".md"))
-                    p)))
+      (setf post (post-for-slug (cdr (assoc :slug pair))))
       (setf rendered (mustache:render* template `((:content . ,post)
                                                   (:pub_date . ,(cdr (assoc :published pair)))
                                                   (:mod_date . ,(cdr (assoc :modified pair)))
@@ -98,7 +123,7 @@
          (data (json:decode-json-from-string (uiop:read-file-string "pages/archive.json")))
          (css `(:css . ,css))
          (limit (cdr (assoc :paginate data)))
-         (posts (reverse (sort (gen-data)
+         (posts (reverse (sort posts
                                'sort-by-ids
                                :key 'car)))
          (times (+ (floor (length posts) limit) 1))
@@ -151,6 +176,10 @@
 (defun sort-by-ids (one two)
   (< (cdr one) (cdr two)))
 
+(defun split-string (string sep)
+  "Wrapper around uiop:split-string to avoid keyword typing."
+  (uiop:split-string string :separator sep))
+
 (defun file-basename (path)
   "Return the file name without extension for PATH."
   (car (uiop:split-string (file-namestring path) :separator ".")))
@@ -171,26 +200,69 @@
         (setf content (with-output-to-string (p)
                         (3bmd:parse-string-and-print-to-stream (uiop:read-file-string page) p)))
         (ensure-directories-exist (concatenate 'string "site/" (cdr (assoc :permalink data))))
-        (write-file (mustache:render* template `( (:slug . ,(cdr (assoc :permalink data)))
+        (write-file (mustache:render* template `((:slug . ,(cdr (assoc :permalink data)))
                                                   ,css
                                                   ,@data
                                                   (:content . ,content)))
                     (concatenate 'string "site/" (cdr (assoc :permalink data)) ".html")))))
 
-(defun gen-rss ()
-  (let ((posts (subseq (gen-data) 0 10))
-        (now )
-)
+(defun return-leading-zero-as-string (number)
+  (if (< number 10)
+    (concatenate 'string "0" (write-to-string number))
+    (write-to-string number)))
 
-(defun gen-sitemap ()
-)
+(defun now-as-rfc-822 ()
+  (multiple-value-bind (second minute hour day month year day-name dst-p tz)
+    (get-decoded-time)
+  (setf day (return-leading-zero-as-string day))
+  (setf minute (return-leading-zero-as-string minute))
+  (setf second (return-leading-zero-as-string second))
+  (if (eq month 0)
+      (setf month month)
+    (setf month (- month 1)))
+  (concatenate 'string
+                      (nth day-name days)
+                      ", "
+                      day
+                      " "
+                      (nth month months)
+                      " "
+                      (write-to-string year)
+                      " "
+                      (write-to-string hour)
+                      ":"
+                      minute
+                      ":"
+                      second
+                      " "
+                      (cdr (assoc tz us-time-zone-codes)))))
+
+(defun format-data-for-rss(post)
+  (let ((slug (cdr (assoc :slug post))))
+    `((:title . ,(cdr (assoc :title post)))
+      (:slug . ,slug)
+      (:excerpt . ,(cdr (assoc :excerpt post)))
+      (:content . ,(post-for-slug slug))
+      (:date . ,(cdr (assoc :published post))))))
+
+(defun gen-rss ()
+  (let* ((posts (subseq posts 0 20))
+         (now (now-as-rfc-822))
+         (template (uiop:read-file-string "templates/rss.mustache"))
+         (proper-posts (mapcar 'format-data-for-rss posts)))
+    (ensure-directories-exist "site/")
+    (write-file (mustache:render* template `((:now . ,now) (:posts . ,proper-posts))) "site/feed.xml")))
+
+(gen-rss)
+
+(defun gen-sitemap ())
 
 (defun main ()
   "The pipeline to build the site."
+  (setf posts (gen-data))
   (copy-public)
   (gen-archive)
   (gen-pages)
   (gen-posts)
-  ;;iframe service for tweets, very minimal JS
   (gen-rss)
   (gen-sitemap))

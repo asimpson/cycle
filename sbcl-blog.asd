@@ -12,4 +12,6 @@
     :3bmd
     :3bmd-ext-code-blocks)
   :components ((:file "package")
-               (:file "sbcl-blog")))
+               (:file "sbcl-blog"))
+  :build-pathname "sbcl"
+  :entry-point "sbcl-blog:main")

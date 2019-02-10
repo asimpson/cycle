@@ -6,4 +6,5 @@
   (:export
     :main
     :write-file
+    :split-string
     :file-basename))
