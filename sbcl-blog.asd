@@ -6,7 +6,7 @@
   :license "MIT"
   :serial t
   :depends-on (
-    :chronicity
+    :local-time
     :cl-json
     :cl-mustache
     :3bmd

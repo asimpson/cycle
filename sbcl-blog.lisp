@@ -32,15 +32,20 @@
                            (10 . "PDT")
                            (11 . "PST")))
 
+(defun concat (&rest strings)
+  "Wrapper around the more cumberson concatenate form."
+  (let (result)
+    (dolist (x strings)
+      (setf result (concatenate 'string result x)))
+    result))
+
 (defun gen-data ()
   "Read markdown posts from 'posts' dir and retrieve data from each matching json file."
   (let* ((posts (uiop:directory-files "posts/" "*.md"))
          (struct (mapcar
                   (lambda (post)
-                    (list post (car (uiop:directory-files "posts/" (concatenate
-                                                                    'string
-                                                                    (file-basename post)
-                                                                    ".json")))))
+                    (list post (car (uiop:directory-files "posts/" (concat (file-basename post)
+                                                                           ".json")))))
                   posts)))
     (mapcar #'parse-post struct)))
 
@@ -54,25 +59,24 @@
 
 (defun copy-public ()
   (let ((files (uiop:directory-files "public/**/")))
-  (ensure-directories-exist "site/")
-  (dolist (file files)
-    (multiple-value-bind (key parts name) (uiop/pathname:split-unix-namestring-directory-components (namestring file))
-      (uiop:copy-file file (concatenate 'string (full-path-as-string "site/")
-                                         (return-public-child-dir parts)
-                                         name))))))
+    (ensure-directories-exist "site/")
+    (dolist (file files)
+      (multiple-value-bind (key parts name) (uiop/pathname:split-unix-namestring-directory-components (namestring file))
+        (uiop:copy-file file (concat (full-path-as-string "site/")
+                                     (return-public-child-dir parts)
+                                     name))))))
 (defun return-public-child-dir (dir)
-  (let ((folder (concatenate 'string (car (last dir)) "/")))
+  (let ((folder (concat (car (last dir)) "/")))
     (unless (equal folder "public/")
-      (unless (uiop/filesystem:directory-exists-p (concatenate 'string "site/" folder))
-        (ensure-directories-exist (concatenate 'string (full-path-as-string "site/") folder)))
+      (unless (uiop/filesystem:directory-exists-p (concat "site/" folder))
+        (ensure-directories-exist (concat (full-path-as-string "site/") folder)))
       folder)))
 
 (defun parse-date (date)
-  (let* ((parsed (chronicity:parse date))
-         (month (write-to-string (chronicity:month-of parsed)))
-         (year (write-to-string (chronicity:year-of parsed)))
-         (day (write-to-string (chronicity:day-of parsed))))
-    (concatenate 'string month "/" day "/" year)))
+  (let ((month (local-time:format-timestring nil (local-time:parse-timestring date) :format '(:month)))
+        (year (local-time:format-timestring nil (local-time:parse-timestring date) :format '(:year)))
+        (day (local-time:format-timestring nil (local-time:parse-timestring date) :format '(:day))))
+    (concat month "/" day "/" year)))
 
 (defun write-file (contents file)
   "Write CONTENTS to FILE."
@@ -84,8 +88,7 @@
 (defun post-for-slug (slug)
   (with-output-to-string (p)
     (3bmd:parse-string-and-print-to-stream
-     (uiop:read-file-string (concatenate
-                             'string
+     (uiop:read-file-string (concat
                              "posts/"
                              slug
                              ".md"))
@@ -106,13 +109,11 @@
                                                   (:formattedDate . ,(parse-date (cdr (assoc :published pair))))
                                                   (:link . ,(cdr (assoc :slug pair)))
                                                   (:description . ,(cdr (assoc :excerpt pair)))
-                                                  (:slug . ,(concatenate 'string
-                                                                         "/writing/"
-                                                                         (cdr (assoc :slug pair))))
+                                                  (:slug . ,(concat "/writing/"
+                                                                    (cdr (assoc :slug pair))))
                                                   (:css . ,css)
                                                   (:title . ,(cdr (assoc :title pair))))))
-      (write-file rendered (concatenate
-                            'string
+      (write-file rendered (concat
                             "site/writing/"
                             (cdr (assoc :slug pair))
                             ".html")))))
@@ -127,19 +128,17 @@
                                'sort-by-ids
                                :key 'car)))
          (times (+ (floor (length posts) limit) 1))
-         (path (concatenate 'string "site" (cdr (assoc :path data))))
+         (path (concat "site" (cdr (assoc :path data))))
          page
          pagination
          slug)
     (ensure-directories-exist path)
     (dotimes (i times)
-      (setf page (concatenate 'string
-                              path
-                              (write-to-string (+ 1 i))
-                              ".html"))
-      (setf slug (concatenate 'string
-                              (cdr (assoc :path data))
-                              (write-to-string (+ i 1))))
+      (setf page (concat path
+                         (write-to-string (+ 1 i))
+                         ".html"))
+      (setf slug (concat (cdr (assoc :path data))
+                         (write-to-string (+ i 1))))
       (setf pagination (gen-pagination-for-archive (+ i 1) times))
       (when (= i (- times 1))
         (write-file (mustache:render* template
@@ -191,51 +190,82 @@
         (template (uiop:read-file-string "templates/page.mustache"))
         data
         content)
-      (dolist (page pages)
-        (setf data (json:decode-json-from-string (uiop:read-file-string
-                                                  (concatenate 'string
-                                                               "pages/"
-                                                               (file-basename page)
-                                                               ".json"))))
-        (setf content (with-output-to-string (p)
-                        (3bmd:parse-string-and-print-to-stream (uiop:read-file-string page) p)))
-        (ensure-directories-exist (concatenate 'string "site/" (cdr (assoc :permalink data))))
-        (write-file (mustache:render* template `((:slug . ,(cdr (assoc :permalink data)))
-                                                  ,css
-                                                  ,@data
-                                                  (:content . ,content)))
-                    (concatenate 'string "site/" (cdr (assoc :permalink data)) ".html")))))
+    (dolist (page pages)
+      (setf data (json:decode-json-from-string (uiop:read-file-string
+                                                (concat "pages/"
+                                                        (file-basename page)
+                                                        ".json"))))
+      (setf content (with-output-to-string (p)
+                      (3bmd:parse-string-and-print-to-stream (uiop:read-file-string page) p)))
+      (ensure-directories-exist (concat "site/" (cdr (assoc :permalink data))))
+      (write-file (mustache:render* template `((:slug . ,(cdr (assoc :permalink data)))
+                                               ,css
+                                               ,@data
+                                               (:content . ,content)))
+                  (concat"site/" (cdr (assoc :permalink data)) ".html")))))
 
 (defun return-leading-zero-as-string (number)
   (if (< number 10)
-    (concatenate 'string "0" (write-to-string number))
+      (concat "0" (write-to-string number))
     (write-to-string number)))
 
 (defun now-as-rfc-822 ()
   (multiple-value-bind (second minute hour day month year day-name dst-p tz)
-    (get-decoded-time)
-  (setf day (return-leading-zero-as-string day))
-  (setf minute (return-leading-zero-as-string minute))
-  (setf second (return-leading-zero-as-string second))
-  (if (eq month 0)
-      (setf month month)
-    (setf month (- month 1)))
-  (concatenate 'string
-                      (nth day-name days)
-                      ", "
-                      day
-                      " "
-                      (nth month months)
-                      " "
-                      (write-to-string year)
-                      " "
-                      (write-to-string hour)
-                      ":"
-                      minute
-                      ":"
-                      second
-                      " "
-                      (cdr (assoc tz us-time-zone-codes)))))
+      (get-decoded-time)
+    (setf day (return-leading-zero-as-string day))
+    (setf minute (return-leading-zero-as-string minute))
+    (setf second (return-leading-zero-as-string second))
+    (if (eq month 0)
+        (setf month month)
+      (setf month (- month 1)))
+    (concat (nth day-name days)
+            ", "
+            day
+            " "
+            (nth month months)
+            " "
+            (write-to-string year)
+            " "
+            (write-to-string hour)
+            ":"
+            minute
+            ":"
+            second
+            " "
+            (cdr (assoc tz us-time-zone-codes)))))
+
+(defun date-as-rfc-822 (date)
+  (let ((year (local-time:format-timestring nil (local-time:parse-timestring date) :format '(:year)))
+        (month (local-time:format-timestring nil
+                                             (local-time:parse-timestring date)
+                                             :format '(:short-month)))
+        (day (local-time:format-timestring nil
+                                           (local-time:parse-timestring date)
+                                           :format '(:short-weekday)))
+        (date (return-leading-zero-as-string
+               (read-from-string
+                (local-time:format-timestring nil
+                                              (local-time:parse-timestring date)
+                                              :format '(:day)))))
+        (hour (return-leading-zero-as-string
+               (read-from-string
+                (local-time:format-timestring nil
+                                              (local-time:parse-timestring date)
+                                              :format '(:hour)))))
+        (minute (return-leading-zero-as-string
+                 (read-from-string
+                  (local-time:format-timestring nil
+                                                (local-time:parse-timestring date)
+                                                :format '(:min)))))
+        (seconds (return-leading-zero-as-string
+                  (read-from-string
+                   (local-time:format-timestring nil
+                                                 (local-time:parse-timestring date)
+                                                 :format '(:sec)))))
+        (tz (local-time:format-timestring nil
+                                          (local-time:parse-timestring date)
+                                          :format '(:timezone))))
+    (concat day ", " date " " month " " year " " hour ":" minute ":" seconds " " tz)))
 
 (defun format-data-for-rss(post)
   (let ((slug (cdr (assoc :slug post))))
@@ -243,19 +273,40 @@
       (:slug . ,slug)
       (:excerpt . ,(cdr (assoc :excerpt post)))
       (:content . ,(post-for-slug slug))
-      (:date . ,(cdr (assoc :published post))))))
+      (:date . ,(date-as-rfc-822 (cdr (assoc :published post)))))))
 
 (defun gen-rss ()
-  (let* ((posts (subseq posts 0 20))
+  (let* ((posts (subseq (reverse (sort posts
+                                       'sort-by-ids
+                                       :key 'car))
+                        0
+                        20))
          (now (now-as-rfc-822))
          (template (uiop:read-file-string "templates/rss.mustache"))
          (proper-posts (mapcar 'format-data-for-rss posts)))
     (ensure-directories-exist "site/")
     (write-file (mustache:render* template `((:now . ,now) (:posts . ,proper-posts))) "site/feed.xml")))
 
-(gen-rss)
+(defun format-data-for-sitemap (post)
+  `((:slug . ,(cdr (assoc :slug post))) (:date . ,(cdr (assoc :published post)))))
 
-(defun gen-sitemap ())
+(defun get-page-slugs ()
+  (let (json)
+    (mapcar (lambda (page)
+              (setf json (json:decode-json-from-string (uiop:read-file-string page)))
+              `((:slug . ,(cdr (assoc :permalink json)))
+                (:date . ,(cdr (assoc :published json)))))
+            (uiop:directory-files "pages/" "*.json"))))
+
+(defun gen-sitemap ()
+  (let ((proper-posts (mapcar 'format-data-for-sitemap posts))
+        (pages (get-page-slugs))
+        (template (uiop:read-file-string "templates/sitemap.mustache")))
+    (ensure-directories-exist "site/")
+    (write-file (mustache:render*
+                 template
+                 `((:posts . ,proper-posts) (:pages . ,pages)))
+                "site/sitemap.xml")))
 
 (defun main ()
   "The pipeline to build the site."

@@ -14,16 +14,18 @@
       <url>
         <loc>https://adamsimpson.net/writing/{{slug}}</loc>
         <priority>0.5</priority>
-        <lastmod>${moment(x.date).format('YYYY-MM-DD')}</lastmod>
+        <lastmod>{{date}}</lastmod>
       </url>
       {{/posts}}
 
       {{#pages}}
-      <url>
-        <loc>https://adamsimpson.net/{{slug}}</loc>
-        <priority>0.5</priority>
-        <lastmod>${moment(x.date).format('YYYY-MM-DD')}</lastmod>
-      </url>
+        {{#slug}}
+        <url>
+          <loc>https://adamsimpson.net{{slug}}</loc>
+          <priority>0.5</priority>
+          <lastmod>{{date}}</lastmod>
+        </url>
+        {{/slug}}
       {{/pages}}
 
     </urlset>
