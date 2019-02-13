@@ -3,7 +3,8 @@
 
 (in-package :cycle-dev)
 
-(defvar *db* (sqlite:connect "BLOG"))
+(when (uiop:file-exists-p "BLOG")
+  (defvar *db* (sqlite:connect "BLOG")))
 
 (defun gen-md ()
   "One-off command to turn html files into md files via pandco process."
@@ -45,5 +46,3 @@
     (if (eq parsed-hour digit)
         (concatenate 'string no-zone "-04:00")
       (concatenate 'string no-zone "-05:00"))))
-
-(write-data-to-file)

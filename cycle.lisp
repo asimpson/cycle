@@ -3,17 +3,18 @@
 
 (in-package :cycle)
 
-(print "Building site...")
-(setf mustache:*load-path* `(,(namestring (car (uiop:subdirectories "./templates")))))
+(when (uiop:directory-exists-p "./templates")
+  (setf mustache:*load-path* `(,(namestring (car (uiop:subdirectories "./templates"))))))
 (setf mustache:*default-pathname-type* "mustache")
 (setf 3bmd-code-blocks:*code-blocks* t)
-(defvar css (uiop:read-file-string "site.css")
-  "CSS for the site.")
+(when (uiop:file-exists-p "site.css")
+  (defvar css (uiop:read-file-string "site.css")
+    "CSS for the site."))
 (defvar posts nil "Global posts variable.")
 (defvar days '("Mon" "Tue" "Wed" "Thu" "Fri" "Sat" "Sun"))
 (defvar months '("Jan"
                  "Feb"
-                 "Mar"
+                "Mar"
                  "Apr"
                  "May"
                  "Jun"
