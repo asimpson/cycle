@@ -34,7 +34,7 @@
                            (11 . "PST")))
 
 (defun concat (&rest strings)
-  "Wrapper around the more cumberson concatenate form."
+  "Wrapper around the more cumbersome concatenate form."
   (let (result)
     (dolist (x strings)
       (setf result (concatenate 'string result x)))
