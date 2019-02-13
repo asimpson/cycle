@@ -1,1 +1,0 @@
-Along with the [move to Siteleaf](/writing/moved-to-siteleaf/) I've also set up an [App.net Broadcast channel](http://app.net/c/207j). The Broadcast channel fires off a push notification to your iOS or Android device whenever I publish a new post. You can also subscribe via e-mail if you wish.

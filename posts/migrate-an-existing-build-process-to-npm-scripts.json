@@ -1,1 +1,0 @@
-{"id":84,"slug":"migrate-an-existing-build-process-to-npm-scripts","title":"Migrate an existing build process to npm scripts","published":"2015-10-18 11:44:35","modified":"2017-05-23 14:05:10","excerpt":"Not all projects need Grunt or Gulp, npm is a great build tool by itself. I recently replaced a Grunt task (with multiple plugins) with a npm script task."}

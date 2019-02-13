@@ -1,1 +1,0 @@
-{"id":107,"slug":"introducing-ivy-feedwrangler","title":"Introducing ivy-feedwrangler","published":"2017-11-16 11:06:20","modified":"2017-11-16 11:06:20","excerpt":"In exploring what Ivy was capable of I had the idea to write a small package that used Ivy as the interface for my RSS service of choice, Feedwrangler."}

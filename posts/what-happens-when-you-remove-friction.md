@@ -1,5 +1,0 @@
-When you remove friction from a process or task, all the factors change. This seems obvious, but it's fundamental to understanding the world as it currently is. Polygon has a [post](http://www.polygon.com/2017/2/21/14683942/pewdiepie-controversy-youtube-drama) up about the rash of "Youtuber burnouts" lately. The conclusion of the article stuck out to me (emphasis mine):
-
-> YouTube has a *speed and quantity problem, and it affects all aspects of the business*. If you are a content creator, take a little time with controversial stuff. It really is fun to make things, but irreverent, boundary-breaking stuff is high-risk/high-reward. Don’t just spit it out: run things by friends and people not in the business. Test the tone before you go live. Sleep on it.
-
-Youtube is entertainment without traditional support mechanisms (i.e. friction). It's relentless and there are no structures in place to push back at all. I think this lack of friction is at the root of the majority of problems in tech. Things move quickly and because of that speed safeguards and checks haven't been instantiated yet. Not everything that pushes back is bad, that push-back can be life-saving.

@@ -1,6 +1,6 @@
 ;;;; package.lisp
 
-(defpackage :sbcl-blog
+(defpackage :cycle
 ;;https://lisp-lang.org/style-guide/#one-package-per-file
   (:use :cl)
   (:export
