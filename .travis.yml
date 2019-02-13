@@ -16,4 +16,4 @@ install:
     fi
 
 script:
-  - sbcl --load "cycle.asd" --eval "(ql:quickload :cycle)" --eval "(sb-ext:save-lisp-and-die \"cycle\" :toplevel 'cycle:main :executable t :compression 9)"
+  - sbcl --load "cycle.asd" --eval "(ql:quickload :cycle)" --eval "(sb-ext:save-lisp-and-die \"cycle\" :toplevel 'cycle:main :executable t)"
