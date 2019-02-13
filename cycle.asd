@@ -3,7 +3,8 @@
 (asdf:defsystem :cycle
   :description "A opinionated static site builder."
   :author "Adam Simpson <adam@adamsimpson.net>"
-  :license "MIT"
+  :license "GNU GPLv3"
+  :version "0.1.0"
   :serial t
   :depends-on (
     :local-time
