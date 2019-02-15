@@ -1,8 +1,24 @@
 ** Cycle
-A static site generator written in Common Lisp that works for me and probably no one else.
+[[https://travis-ci.org/asimpson/cycle.svg?branch=master]]
+
+♻ A static site generator written in Common Lisp that works for me and probably no one else.
+
+*** Folder structure
+#+BEGIN_SRC
+.
+├── pages
+├── posts
+├── public
+│   ├── images
+│   └── js
+└── templates
+    └── partials
+#+END_SRC
+
+*** Pre-built binaries
+Currently there are pre-built binaries for Linux and macOS in [[https://github.com/asimpson/cycle/releases][Releases]].
 
 *** Compile binary
-
 #+BEGIN_SRC shell
 sbcl --load "cycle.asd" --eval "(ql:quickload :cycle)" --eval "(sb-ext:save-lisp-and-die \"cycle\" :toplevel 'cycle:main :executable t :compression 9)"
 
