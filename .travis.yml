@@ -18,6 +18,8 @@ install:
 script:
   - sbcl --load "cycle.asd" --eval "(ql:quickload :cycle)" --eval "(sb-ext:save-lisp-and-die \"cycle\" :toplevel 'cycle:main :executable t)"
 
+before_deploy: "mv cycle cycle-linux"
+
 deploy:
   provider: releases
   api_key: $GITHUB_OAUTH_TOKEN
