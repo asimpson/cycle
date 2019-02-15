@@ -3,14 +3,9 @@
 
 (in-package :cycle)
 
-(when (uiop:directory-exists-p "./templates")
-  (setf mustache:*load-path* `(,(namestring (car (uiop:subdirectories "./templates"))))))
-(setf mustache:*default-pathname-type* "mustache")
-(setf 3bmd-code-blocks:*code-blocks* t)
-(when (uiop:file-exists-p "site.css")
-  (defvar css (uiop:read-file-string "site.css")
-    "CSS for the site."))
 (defvar posts nil "Global posts variable.")
+(defvar css nil
+  "CSS for the site.")
 (defvar days '("Mon" "Tue" "Wed" "Thu" "Fri" "Sat" "Sun"))
 (defvar months '("Jan"
                  "Feb"
@@ -60,12 +55,12 @@
 
 (defun copy-public ()
   (let ((files (uiop:directory-files "public/**/")))
-    (ensure-directories-exist "site/")
     (dolist (file files)
       (multiple-value-bind (key parts name) (uiop/pathname:split-unix-namestring-directory-components (namestring file))
         (uiop:copy-file file (concat (full-path-as-string "site/")
                                      (return-public-child-dir parts)
                                      name))))))
+
 (defun return-public-child-dir (dir)
   (let ((folder (concat (car (last dir)) "/")))
     (unless (equal folder "public/")
@@ -125,26 +120,19 @@
          (data (json:decode-json-from-string (uiop:read-file-string "pages/archive.json")))
          (css `(:css . ,css))
          (limit (cdr (assoc :paginate data)))
-         (posts (reverse (sort posts
-                               'sort-by-ids
-                               :key 'car)))
          (times (+ (floor (length posts) limit) 1))
          (path (concat "site" (cdr (assoc :path data))))
          page
-         pagination
-         slug)
+         pagination)
     (ensure-directories-exist path)
     (dotimes (i times)
       (setf page (concat path
                          (write-to-string (+ 1 i))
                          ".html"))
-      (setf slug (concat (cdr (assoc :path data))
-                         (write-to-string (+ i 1))))
       (setf pagination (gen-pagination-for-archive (+ i 1) times))
       (when (= i (- times 1))
         (write-file (mustache:render* template
-                                      `((:slug . ,slug)
-                                        ,css
+                                      `(,css
                                         ,@pagination
                                         (:posts . ,(subseq
                                                     posts
@@ -152,8 +140,7 @@
                     page))
       (when (< i (- times 1))
         (write-file (mustache:render* template
-                                      `((:slug . ,slug)
-                                        ,css
+                                      `(,css
                                         ,@pagination
                                         (:posts . ,(subseq
                                                     posts
@@ -183,6 +170,12 @@
 (defun file-basename (path)
   "Return the file name without extension for PATH."
   (car (uiop:split-string (file-namestring path) :separator ".")))
+
+(defun gen-index()
+  (let* ((template (uiop:read-file-string "templates/index.mustache"))
+         (posts (subseq posts 0 10))
+         (rendered (mustache:render* template `((:posts . ,posts)))))
+    (write-file rendered "site/index.html")))
 
 (defun gen-pages ()
   "Generate any markdown files in the pages/ dir using matching JSON files as context."
@@ -277,15 +270,10 @@
       (:date . ,(date-as-rfc-822 (cdr (assoc :published post)))))))
 
 (defun gen-rss ()
-  (let* ((posts (subseq (reverse (sort posts
-                                       'sort-by-ids
-                                       :key 'car))
-                        0
-                        20))
+  (let* ((posts (subseq posts 0 20))
          (now (now-as-rfc-822))
          (template (uiop:read-file-string "templates/rss.mustache"))
          (proper-posts (mapcar 'format-data-for-rss posts)))
-    (ensure-directories-exist "site/")
     (write-file (mustache:render* template `((:now . ,now) (:posts . ,proper-posts))) "site/feed.xml")))
 
 (defun format-data-for-sitemap (post)
@@ -303,7 +291,6 @@
   (let ((proper-posts (mapcar 'format-data-for-sitemap posts))
         (pages (get-page-slugs))
         (template (uiop:read-file-string "templates/sitemap.mustache")))
-    (ensure-directories-exist "site/")
     (write-file (mustache:render*
                  template
                  `((:posts . ,proper-posts) (:pages . ,pages)))
@@ -311,9 +298,19 @@
 
 (defun main ()
   "The pipeline to build the site."
-  (setf posts (gen-data))
+  (ensure-directories-exist "site/")
+  (when (uiop:directory-exists-p "./templates")
+   (setf mustache:*load-path* `(,(namestring (car (uiop:subdirectories "./templates"))))))
+  (when (uiop:file-exists-p "site.css")
+    (setf css (uiop:read-file-string "site.css")))
+  (setf mustache:*default-pathname-type* "mustache")
+  (setf 3bmd-code-blocks:*code-blocks* t)
+  (setf posts (reverse (sort (gen-data)
+                             'sort-by-ids
+                             :key 'car)))
   (copy-public)
   (gen-archive)
+  (gen-index)
   (gen-pages)
   (gen-posts)
   (gen-rss)
