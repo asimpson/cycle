@@ -72,7 +72,7 @@
   (let ((month (local-time:format-timestring nil (local-time:parse-timestring date) :format '(:month)))
         (year (local-time:format-timestring nil (local-time:parse-timestring date) :format '(:year)))
         (day (local-time:format-timestring nil (local-time:parse-timestring date) :format '(:day))))
-    (concat month "/" day "/" year)))
+    (concat year "-" month "-" day)))
 
 (defun write-file (contents file)
   "Write CONTENTS to FILE."
@@ -174,7 +174,7 @@
 (defun gen-index()
   (let* ((template (uiop:read-file-string "templates/index.mustache"))
          (posts (subseq posts 0 10))
-         (rendered (mustache:render* template `((:posts . ,posts)))))
+         (rendered (mustache:render* template `((:posts . ,posts) (:css . ,css)))))
     (write-file rendered "site/index.html")))
 
 (defun gen-pages ()
@@ -196,7 +196,7 @@
                                                ,css
                                                ,@data
                                                (:content . ,content)))
-                  (concat"site/" (cdr (assoc :permalink data)) ".html")))))
+                  (concat "site/" (cdr (assoc :permalink data)) ".html")))))
 
 (defun return-leading-zero-as-string (number)
   (if (< number 10)
@@ -274,7 +274,7 @@
          (now (now-as-rfc-822))
          (template (uiop:read-file-string "templates/rss.mustache"))
          (proper-posts (mapcar 'format-data-for-rss posts)))
-    (write-file (mustache:render* template `((:now . ,now) (:posts . ,proper-posts))) "site/feed.xml")))
+    (write-file (mustache:render* template `((:now . ,now) (:posts . ,proper-posts))) "site/rss.xml")))
 
 (defun format-data-for-sitemap (post)
   `((:slug . ,(cdr (assoc :slug post))) (:date . ,(cdr (assoc :published post)))))
