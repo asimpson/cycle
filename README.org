@@ -19,8 +19,7 @@
 Currently there are pre-built binaries for Linux and macOS in [[https://github.com/asimpson/cycle/releases][Releases]].
 
 *** Compile binary
-#+BEGIN_SRC shell
-sbcl --load "cycle.asd" --eval "(ql:quickload :cycle)" --eval "(sb-ext:save-lisp-and-die \"cycle\" :toplevel 'cycle:main :executable t :compression 9)"
-
-ecl --load "cycle.asd" --eval "(ql:quickload :cycle)" --eval "(asdf:make-build :cycle :type :program :prologue-code '(setf compiler:*compile-verbose* nil) :move-here \"./\")"
-#+END_SRC
+**** sbcl
+~make~
+**** ecl
+~make ecl~
