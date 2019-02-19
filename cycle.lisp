@@ -304,7 +304,7 @@
 
 (defun main ()
   "The pipeline to build the site."
-  (ensure-directories-exist "site/")
+  (ensure-directories-exist "site/writing/")
   (when (uiop:directory-exists-p "./templates")
    (setf mustache:*load-path* `(,(namestring (car (uiop:subdirectories "./templates"))))))
   (when (uiop:file-exists-p "site.css")
