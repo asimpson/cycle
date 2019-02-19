@@ -92,11 +92,10 @@
 
 (defun gen-posts ()
   "Generate posts from post data, templates, and css file(s)."
-  (let ((data posts)
-        (template (uiop:read-file-string "templates/post.mustache"))
+  (let ((template (uiop:read-file-string "templates/post.mustache"))
         post
         rendered)
-    (dolist (pair data)
+    (dolist (pair posts)
       (setf post (post-for-slug (cdr (assoc :slug pair))))
       (setf rendered (mustache:render* template `((:content . ,post)
                                                   (:pub_date . ,(cdr (assoc :published pair)))
@@ -120,33 +119,40 @@
          (data (json:decode-json-from-string (uiop:read-file-string "pages/archive.json")))
          (css `(:css . ,css))
          (limit (cdr (assoc :paginate data)))
-         (times (+ (floor (length posts) limit) 1))
          (path (concat "site" (cdr (assoc :path data))))
          page
+         times
          pagination)
     (ensure-directories-exist path)
-    (dotimes (i times)
-      (setf page (concat path
-                         (write-to-string (+ 1 i))
-                         ".html"))
-      (setf pagination (gen-pagination-for-archive (+ i 1) times))
-      (when (= i (- times 1))
-        (write-file (mustache:render* template
-                                      `(,css
-                                        ,@pagination
-                                        (:posts . ,(subseq
-                                                    posts
-                                                    (* i limit)))))
-                    page))
-      (when (< i (- times 1))
-        (write-file (mustache:render* template
-                                      `(,css
-                                        ,@pagination
-                                        (:posts . ,(subseq
-                                                    posts
-                                                    (* i limit)
-                                                    (+ (* i limit) limit)))))
-                    page)))))
+    (if (> limit 0)
+        (progn
+          (setf times (+ (floor (length posts) limit) 1))
+          (dotimes (i times)
+            (setf page (concat path
+                              (write-to-string (+ 1 i))
+                              ".html"))
+            (setf pagination (gen-pagination-for-archive (+ i 1) times))
+            (when (= i (- times 1))
+              (write-file (mustache:render* template
+                                            `(,css
+                                              ,@pagination
+                                              (:posts . ,(subseq
+                                                          posts
+                                                          (* i limit)))))
+                          page))
+            (when (< i (- times 1))
+              (write-file (mustache:render* template
+                                            `(,css
+                                              ,@pagination
+                                              (:posts . ,(subseq
+                                                          posts
+                                                          (* i limit)
+                                                          (+ (* i limit) limit)))))
+                          page))))
+      (write-file (mustache:render* template
+                                        `(,css
+                                          (:posts . ,posts)))
+                  (concat path ".html")))))
 
 (defun gen-pagination-for-archive (index limit)
   "Given INDEX and LIMIT this will return an alist of values for pagination."
