@@ -1,5 +1,7 @@
 FROM alpine:edge
 
+LABEL maintainer="mike@mikeyockey.com"
+
 RUN mkdir /src
 
 WORKDIR /src
