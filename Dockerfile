@@ -1,4 +1,4 @@
-FROM alpine:edge
+FROM alpine:edge as builder
 
 LABEL maintainer="mike@mikeyockey.com"
 
@@ -19,8 +19,12 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/reposit
     curl -L -o cycle-master.zip "https://github.com/asimpson/cycle/archive/master.zip" && \
     unzip cycle-master.zip && \
     cd cycle-master && \
-    make && \
-    mkdir -p /opt/bin && \
-    cp cycle /opt/bin
+    make
 
-ENTRYPOINT '/opt/bin/cycle'
+FROM alpine:edge
+
+WORKDIR /opt/bin
+
+COPY --from=builder /src/cycle-master/cycle .
+
+CMD ["./cycle"]
