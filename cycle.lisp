@@ -318,7 +318,7 @@
 (defun main ()
   "The pipeline to build the site."
   (ensure-directories-exist "site/writing/")
-  (when (uiop:directory-exists-p "./templates")
+  (when (uiop:subdirectories "./templates")
    (setf mustache:*load-path* `(,(namestring (car (uiop:subdirectories "./templates"))))))
   (when (uiop:file-exists-p "site.css")
     (setf css (uiop:read-file-string "site.css")))
@@ -327,7 +327,7 @@
   (setf posts (reverse (sort (gen-data)
                              'sort-by-ids
                              :key 'car)))
-  (if posts
+  (if (and css posts)
     (progn
       (copy-public)
       (gen-archive)
@@ -336,4 +336,4 @@
       (gen-posts)
       (gen-rss)
       (gen-sitemap))
-    (print "No posts found. Create a md file in posts/.")))
+    (print "No posts found. Create a md file in posts/. Also create a site.css file in the root.")))
