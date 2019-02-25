@@ -6,27 +6,6 @@
 (defvar posts nil "Global posts variable.")
 (defvar css nil
   "CSS for the site.")
-(defvar days '("Mon" "Tue" "Wed" "Thu" "Fri" "Sat" "Sun"))
-(defvar months '("Jan"
-                 "Feb"
-                "Mar"
-                 "Apr"
-                 "May"
-                 "Jun"
-                 "Jul"
-                 "Aug"
-                 "Sep"
-                 "Oct"
-                 "Nov"
-                 "Dec"))
-(defvar us-time-zone-codes '((4 . "EDT")
-                           (5 . "EST")
-                           (6 . "CDT")
-                           (7 . "CST")
-                           (8 . "MDT")
-                           (9 . "MST")
-                           (10 . "PDT")
-                           (11 . "PST")))
 
 (defun concat (&rest strings)
   "Wrapper around the more cumbersome concatenate form."
@@ -219,29 +198,7 @@
     (write-to-string number)))
 
 (defun now-as-rfc-822 ()
-  (multiple-value-bind (second minute hour day month year day-name dst-p tz)
-      (get-decoded-time)
-    (setf day (return-leading-zero-as-string day))
-    (setf minute (return-leading-zero-as-string minute))
-    (setf second (return-leading-zero-as-string second))
-    (if (eq month 0)
-        (setf month month)
-      (setf month (- month 1)))
-    (concat (nth day-name days)
-            ", "
-            day
-            " "
-            (nth month months)
-            " "
-            (write-to-string year)
-            " "
-            (write-to-string hour)
-            ":"
-            minute
-            ":"
-            second
-            " "
-            (cdr (assoc tz us-time-zone-codes)))))
+  (date-as-rfc-822 (local-time:format-timestring nil (local-time:now))))
 
 (defun date-as-rfc-822 (date)
   (let ((year (local-time:format-timestring nil (local-time:parse-timestring date) :format '(:year)))
