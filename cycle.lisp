@@ -7,11 +7,23 @@
 (defvar css nil
   "CSS for the site.")
 
+(opts:define-opts
+    (:name :help
+          :description "`generate` is the only available command at the moment."
+          :short #\h
+          :long "help"))
+
 (defun concat (&rest strings)
   "Wrapper around the more cumbersome concatenate form."
   (let (result)
     (dolist (x strings)
       (setf result (concatenate 'string result x)))
+    result))
+
+(defun shell (cmd)
+  "Return the output of CMD as a string."
+  (multiple-value-bind (result)
+      (uiop:run-program cmd :output '(:string :stripped t))
     result))
 
 (defun gen-data ()
@@ -272,25 +284,64 @@
                   "site/sitemap.xml"))
     (print "No sitemap.mustache template found. Please create one in templates/.")))
 
+(defun get-id()
+  "Get all JSON files representing all posts and return the next ID to use."
+  (let ((files (uiop:directory-files "posts/" "*.json")))
+    (if files
+        (+ 1
+           (car (sort
+                 (mapcar
+                  (lambda (file)
+                    (cdr (assoc :id (json:decode-json-from-string
+                                     (uiop:read-file-string file)))))
+                  files)
+                 #'>)))
+        1)))
+
+(defun generate-post (title)
+  "Take TITLE and create the necessary JSON and MD files for it."
+  (let ((date (shell "date +%Y-%m-%dT%R:%S%:z"))
+        (id (get-id))
+        (json-file (concat "./posts/" title ".json"))
+        (md-file (concat "./posts/" title ".md")))
+    (write-file (json:encode-json-to-string `(("id" . ,id)
+                                              ("published" . ,date)
+                                              ("title" . ,title)
+                                              ("slug" . ,title)
+                                              ("modified" . ,date)
+                                              ("excerpt" . "")))
+                json-file)
+    (write-file title md-file)))
+
 (defun main ()
   "The pipeline to build the site."
-  (ensure-directories-exist "site/writing/")
-  (when (uiop:subdirectories "./templates")
-   (setf mustache:*load-path* `(,(namestring (car (uiop:subdirectories "./templates"))))))
-  (when (uiop:file-exists-p "site.css")
-    (setf css (uiop:read-file-string "site.css")))
-  (setf mustache:*default-pathname-type* "mustache")
-  (setf 3bmd-code-blocks:*code-blocks* t)
-  (setf posts (reverse (sort (gen-data)
-                             'sort-by-ids
-                             :key 'car)))
-  (if (and css posts)
-    (progn
-      (copy-public)
-      (gen-archive)
-      (gen-index)
-      (gen-pages)
-      (gen-posts)
-      (gen-rss)
-      (gen-sitemap))
-    (print "No posts found. Create a md file in posts/. Also create a site.css file in the root.")))
+
+  (if (equal (car (cdr (opts:argv))) "generate")
+    (generate-post (car (last (opts:argv))))
+  (progn
+    (ensure-directories-exist "site/writing/")
+    (when (uiop:subdirectories "./templates")
+    (setf mustache:*load-path* `(,(namestring (car (uiop:subdirectories "./templates"))))))
+    (when (uiop:file-exists-p "site.css")
+      (setf css (uiop:read-file-string "site.css")))
+    (setf mustache:*default-pathname-type* "mustache")
+    (setf 3bmd-code-blocks:*code-blocks* t)
+    (setf posts (reverse (sort (gen-data)
+                              'sort-by-ids
+                              :key 'car)))
+
+    (multiple-value-bind (options free-args)
+        (opts:get-opts)
+      (when options
+        (opts:describe)))
+
+    (if (and css posts)
+      (progn
+        (copy-public)
+        (gen-archive)
+        (gen-index)
+        (gen-pages)
+        (gen-posts)
+        (gen-rss)
+        (gen-sitemap))
+      (print "No posts found. Create a md file in posts/. Also create a site.css file in the root.")))))

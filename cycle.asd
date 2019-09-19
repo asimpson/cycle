@@ -11,7 +11,8 @@
     :cl-json
     :cl-mustache
     :3bmd
-    :3bmd-ext-code-blocks)
+    :3bmd-ext-code-blocks
+    :unix-opts)
   :components ((:file "package")
                (:file "cycle"))
   :build-pathname "cycle"
