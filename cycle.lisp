@@ -8,10 +8,10 @@
   "CSS for the site.")
 
 (opts:define-opts
-    (:name :help
-          :description "`generate` is the only available command at the moment."
-          :short #\h
-          :long "help"))
+  (:name :help
+   :description "`generate` is the only available command at the moment."
+   :short #\h
+   :long "help"))
 
 (defun concat (&rest strings)
   "Wrapper around the more cumbersome concatenate form."
@@ -39,7 +39,7 @@
 (defun parse-post (post)
   "Create list that contains the data from each JSON file combined with the body of every post."
   (let* ((json (uiop:read-file-string (car (cdr post))))
-        (list-json (json:decode-json-from-string json)))
+         (list-json (json:decode-json-from-string json)))
     `(,@list-json (:content . ,(post-for-slug (cdr (assoc :slug list-json)))))))
 
 (defun full-path-as-string (dir)
@@ -69,8 +69,8 @@
 (defun write-file (contents file)
   "Write CONTENTS to FILE."
   (with-open-file (stream file
-                     :direction :output
-                     :if-exists :supersede)
+                          :direction :output
+                          :if-exists :supersede)
     (write-sequence contents stream)))
 
 (defun post-for-slug (slug)
@@ -85,49 +85,49 @@
 (defun gen-posts ()
   "Generate posts from post data, templates, and css file(s)."
   (if (uiop:file-exists-p "templates/post.mustache")
-    (let ((template (uiop:read-file-string "templates/post.mustache"))
-          post
-          rendered)
-      (dolist (pair posts)
-        (setf post `((:content . ,(cdr (assoc :content pair)))
-                  (:pub_date . ,(cdr (assoc :published pair)))
-                  (:mod_date . ,(cdr (assoc :modified pair)))
-                  (:modifiedDate . ,(parse-date (cdr (assoc :modified pair))))
-                  (:formattedDate . ,(parse-date (cdr (assoc :published pair))))
-                  (:link . ,(cdr (assoc :link pair)))
-                  (:description . ,(cdr (assoc :excerpt pair)))
-                  (:slug . ,(concat "/writing/"
-                                    (cdr (assoc :slug pair))))
-                  (:css . ,css)
-                  (:title . ,(cdr (assoc :title pair)))))
+      (let ((template (uiop:read-file-string "templates/post.mustache"))
+            post
+            rendered)
+        (dolist (pair posts)
+          (setf post `((:content . ,(cdr (assoc :content pair)))
+                       (:pub_date . ,(cdr (assoc :published pair)))
+                       (:mod_date . ,(cdr (assoc :modified pair)))
+                       (:modifiedDate . ,(parse-date (cdr (assoc :modified pair))))
+                       (:formattedDate . ,(parse-date (cdr (assoc :published pair))))
+                       (:link . ,(cdr (assoc :link pair)))
+                       (:description . ,(cdr (assoc :excerpt pair)))
+                       (:slug . ,(concat "/writing/"
+                                         (cdr (assoc :slug pair))))
+                       (:css . ,css)
+                       (:title . ,(cdr (assoc :title pair)))))
 
-        (setf rendered (mustache:render* template post))
-        (write-file rendered (concat
-                              "site/writing/"
-                              (cdr (assoc :slug pair))
-                              ".html"))))
-    (print "No post.mustache template found. Create it in templates/.")))
+          (setf rendered (mustache:render* template post))
+          (write-file rendered (concat
+                                "site/writing/"
+                                (cdr (assoc :slug pair))
+                                ".html"))))
+      (print "No post.mustache template found. Create it in templates/.")))
 
 (defun gen-archive ()
   "Create archive type pages."
   (if (and (uiop:file-exists-p "pages/archive.mustache")
            (uiop:file-exists-p "pages/archive.json"))
       (let* ((template (uiop:read-file-string "pages/archive.mustache"))
-            (data (json:decode-json-from-string (uiop:read-file-string "pages/archive.json")))
-            (css `(:css . ,css))
-            (limit (cdr (assoc :paginate data)))
-            (path (concat "site" (cdr (assoc :path data))))
-            page
-            times
-            pagination)
+             (data (json:decode-json-from-string (uiop:read-file-string "pages/archive.json")))
+             (css `(:css . ,css))
+             (limit (cdr (assoc :paginate data)))
+             (path (concat "site" (cdr (assoc :path data))))
+             page
+             times
+             pagination)
         (ensure-directories-exist path)
         (if (> limit 0)
             (progn
               (setf times (+ (floor (length posts) limit) 1))
               (dotimes (i times)
                 (setf page (concat path
-                                  (write-to-string (+ 1 i))
-                                  ".html"))
+                                   (write-to-string (+ 1 i))
+                                   ".html"))
                 (setf pagination (gen-pagination-for-archive (+ i 1) times))
                 (when (= i (- times 1))
                   (write-file (mustache:render* template
@@ -146,11 +146,11 @@
                                                               (* i limit)
                                                               (+ (* i limit) limit)))))
                               page))))
-          (write-file (mustache:render* template
-                                            `(,css
-                                              (:posts . ,posts)))
-                      (concat path ".html"))))
-    (print "The files for generating an archive are missing. Create a archive.mustache file and a archive.json file in pages/.")))
+            (write-file (mustache:render* template
+                                          `(,css
+                                            (:posts . ,posts)))
+                        (concat path ".html"))))
+      (print "The files for generating an archive are missing. Create a archive.mustache file and a archive.json file in pages/.")))
 
 (defun gen-pagination-for-archive (index limit)
   "Given INDEX and LIMIT this will return an alist of values for pagination."
@@ -178,38 +178,38 @@
 (defun gen-index()
   (if (uiop:file-exists-p "templates/index.mustache")
       (let* ((template (uiop:read-file-string "templates/index.mustache"))
-            (posts (subseq posts 0 10))
-            (rendered (mustache:render* template `((:posts . ,posts) (:css . ,css)))))
+             (posts (subseq posts 0 10))
+             (rendered (mustache:render* template `((:posts . ,posts) (:css . ,css)))))
         (write-file rendered "site/index.html"))
-    (print "No index.mustache file found. Create a mustache file named index.mustache in templates/.")))
+      (print "No index.mustache file found. Create a mustache file named index.mustache in templates/.")))
 
 (defun gen-pages ()
   "Generate any markdown files in the pages/ dir using matching JSON files as context."
   (if (uiop:file-exists-p "templates/page.mustache")
-    (let ((pages (uiop:directory-files "pages/" "*.md"))
-          (css `(:css . ,css))
-          (template (uiop:read-file-string "templates/page.mustache"))
-          data
-          content)
-      (dolist (page pages)
-        (setf data (json:decode-json-from-string (uiop:read-file-string
-                                                  (concat "pages/"
-                                                          (file-basename page)
-                                                          ".json"))))
-        (setf content (with-output-to-string (p)
-                        (3bmd:parse-string-and-print-to-stream (uiop:read-file-string page) p)))
-        (ensure-directories-exist (concat "site/" (cdr (assoc :permalink data))))
-        (write-file (mustache:render* template `((:slug . ,(cdr (assoc :permalink data)))
-                                                ,css
-                                                ,@data
-                                                (:content . ,content)))
-                    (concat "site/" (cdr (assoc :permalink data)) ".html"))))
-    (print "No page.mustache file found. Please create one in templates/.")))
+      (let ((pages (uiop:directory-files "pages/" "*.md"))
+            (css `(:css . ,css))
+            (template (uiop:read-file-string "templates/page.mustache"))
+            data
+            content)
+        (dolist (page pages)
+          (setf data (json:decode-json-from-string (uiop:read-file-string
+                                                    (concat "pages/"
+                                                            (file-basename page)
+                                                            ".json"))))
+          (setf content (with-output-to-string (p)
+                          (3bmd:parse-string-and-print-to-stream (uiop:read-file-string page) p)))
+          (ensure-directories-exist (concat "site/" (cdr (assoc :permalink data))))
+          (write-file (mustache:render* template `((:slug . ,(cdr (assoc :permalink data)))
+                                                   ,css
+                                                   ,@data
+                                                   (:content . ,content)))
+                      (concat "site/" (cdr (assoc :permalink data)) ".html"))))
+      (print "No page.mustache file found. Please create one in templates/.")))
 
 (defun return-leading-zero-as-string (number)
   (if (< number 10)
       (concat "0" (write-to-string number))
-    (write-to-string number)))
+      (write-to-string number)))
 
 (defun now-as-rfc-822 ()
   (date-as-rfc-822 (local-time:format-timestring nil (local-time:now))))
@@ -257,12 +257,12 @@
 
 (defun gen-rss ()
   (if (uiop:file-exists-p "templates/rss.mustache")
-    (let* ((posts (subseq posts 0 20))
-          (now (now-as-rfc-822))
-          (template (uiop:read-file-string "templates/rss.mustache"))
-          (proper-posts (mapcar 'format-data-for-rss posts)))
-      (write-file (mustache:render* template `((:now . ,now) (:posts . ,proper-posts))) "site/rss.xml"))
-    (print "No rss template found. Please create one in templates/.")))
+      (let* ((posts (subseq posts 0 20))
+             (now (now-as-rfc-822))
+             (template (uiop:read-file-string "templates/rss.mustache"))
+             (proper-posts (mapcar 'format-data-for-rss posts)))
+        (write-file (mustache:render* template `((:now . ,now) (:posts . ,proper-posts))) "site/rss.xml"))
+      (print "No rss template found. Please create one in templates/.")))
 
 (defun format-data-for-sitemap (post)
   `((:slug . ,(cdr (assoc :slug post))) (:date . ,(cdr (assoc :published post)))))
@@ -277,14 +277,14 @@
 
 (defun gen-sitemap ()
   (if (uiop:file-exists-p "templates/sitemap.mustache")
-    (let ((proper-posts (mapcar 'format-data-for-sitemap posts))
-          (pages (get-page-slugs))
-          (template (uiop:read-file-string "templates/sitemap.mustache")))
-      (write-file (mustache:render*
-                  template
-                  `((:posts . ,proper-posts) (:pages . ,pages)))
-                  "site/sitemap.xml"))
-    (print "No sitemap.mustache template found. Please create one in templates/.")))
+      (let ((proper-posts (mapcar 'format-data-for-sitemap posts))
+            (pages (get-page-slugs))
+            (template (uiop:read-file-string "templates/sitemap.mustache")))
+        (write-file (mustache:render*
+                     template
+                     `((:posts . ,proper-posts) (:pages . ,pages)))
+                    "site/sitemap.xml"))
+      (print "No sitemap.mustache template found. Please create one in templates/.")))
 
 (defun get-id()
   "Get all JSON files representing all posts and return the next ID to use."
@@ -319,31 +319,31 @@
   "The pipeline to build the site."
 
   (if (equal (car (cdr (opts:argv))) "generate")
-    (generate-post (car (last (opts:argv))))
-  (progn
-    (ensure-directories-exist "site/writing/")
-    (when (uiop:subdirectories "./templates")
-    (setf mustache:*load-path* `(,(namestring (car (uiop:subdirectories "./templates"))))))
-    (when (uiop:file-exists-p "site.css")
-      (setf css (uiop:read-file-string "site.css")))
-    (setf mustache:*default-pathname-type* "mustache")
-    (setf 3bmd-code-blocks:*code-blocks* t)
-    (setf posts (reverse (sort (gen-data)
-                              'sort-by-ids
-                              :key 'car)))
-
-    (multiple-value-bind (options free-args)
-        (opts:get-opts)
-      (when options
-        (opts:describe)))
-
-    (if (and css posts)
+      (generate-post (car (last (opts:argv))))
       (progn
-        (copy-public)
-        (gen-archive)
-        (gen-index)
-        (gen-pages)
-        (gen-posts)
-        (gen-rss)
-        (gen-sitemap))
-      (print "No posts found. Create a md file in posts/. Also create a site.css file in the root.")))))
+        (ensure-directories-exist "site/writing/")
+        (when (uiop:subdirectories "./templates")
+          (setf mustache:*load-path* `(,(namestring (car (uiop:subdirectories "./templates"))))))
+        (when (uiop:file-exists-p "site.css")
+          (setf css (uiop:read-file-string "site.css")))
+        (setf mustache:*default-pathname-type* "mustache")
+        (setf 3bmd-code-blocks:*code-blocks* t)
+        (setf posts (reverse (sort (gen-data)
+                                   'sort-by-ids
+                                   :key 'car)))
+
+        (multiple-value-bind (options free-args)
+            (opts:get-opts)
+          (when options
+            (opts:describe)))
+
+        (if (and css posts)
+            (progn
+              (copy-public)
+              (gen-archive)
+              (gen-index)
+              (gen-pages)
+              (gen-posts)
+              (gen-rss)
+              (gen-sitemap))
+            (print "No posts found. Create a md file in posts/. Also create a site.css file in the root.")))))
