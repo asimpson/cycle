@@ -37,9 +37,10 @@
     (mapcar #'parse-post struct)))
 
 (defun parse-post (post)
-  "Convert json data to list."
-  (let ((json (uiop:read-file-string (car (cdr post)))))
-    (json:decode-json-from-string json)))
+  "Create list that contains the data from each JSON file combined with the body of every post."
+  (let* ((json (uiop:read-file-string (car (cdr post))))
+        (list-json (json:decode-json-from-string json)))
+    `(,@list-json (:content . ,(post-for-slug (cdr (assoc :slug list-json)))))))
 
 (defun full-path-as-string (dir)
   (namestring (truename dir)))
@@ -88,18 +89,19 @@
           post
           rendered)
       (dolist (pair posts)
-        (setf post (post-for-slug (cdr (assoc :slug pair))))
-        (setf rendered (mustache:render* template `((:content . ,post)
-                                                    (:pub_date . ,(cdr (assoc :published pair)))
-                                                    (:mod_date . ,(cdr (assoc :modified pair)))
-                                                    (:modifiedDate . ,(parse-date (cdr (assoc :modified pair))))
-                                                    (:formattedDate . ,(parse-date (cdr (assoc :published pair))))
-                                                    (:link . ,(cdr (assoc :slug pair)))
-                                                    (:description . ,(cdr (assoc :excerpt pair)))
-                                                    (:slug . ,(concat "/writing/"
-                                                                      (cdr (assoc :slug pair))))
-                                                    (:css . ,css)
-                                                    (:title . ,(cdr (assoc :title pair))))))
+        (setf post `((:content . ,(cdr (assoc :content pair)))
+                  (:pub_date . ,(cdr (assoc :published pair)))
+                  (:mod_date . ,(cdr (assoc :modified pair)))
+                  (:modifiedDate . ,(parse-date (cdr (assoc :modified pair))))
+                  (:formattedDate . ,(parse-date (cdr (assoc :published pair))))
+                  (:link . ,(cdr (assoc :link pair)))
+                  (:description . ,(cdr (assoc :excerpt pair)))
+                  (:slug . ,(concat "/writing/"
+                                    (cdr (assoc :slug pair))))
+                  (:css . ,css)
+                  (:title . ,(cdr (assoc :title pair)))))
+
+        (setf rendered (mustache:render* template post))
         (write-file rendered (concat
                               "site/writing/"
                               (cdr (assoc :slug pair))
