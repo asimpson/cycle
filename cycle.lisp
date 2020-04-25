@@ -252,7 +252,8 @@
     `((:title . ,(cdr (assoc :title post)))
       (:slug . ,slug)
       (:excerpt . ,(cdr (assoc :excerpt post)))
-      (:content . ,(post-for-slug slug))
+      (:link . ,(cdr (assoc :link post)))
+      (:content . ,(cdr (assoc :content post)))
       (:date . ,(date-as-rfc-822 (cdr (assoc :published post)))))))
 
 (defun gen-rss ()
