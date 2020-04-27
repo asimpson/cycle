@@ -244,7 +244,7 @@
                                                  :format '(:sec)))))
         (tz (local-time:format-timestring nil
                                           (local-time:parse-timestring date)
-                                          :format '(:timezone))))
+                                          :format '(:gmt-offset-hhmm))))
     (concat day ", " date " " month " " year " " hour ":" minute ":" seconds " " tz)))
 
 (defun format-data-for-rss(post)
