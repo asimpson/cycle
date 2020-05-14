@@ -303,10 +303,13 @@
 
 (defun generate-post (title)
   "Take TITLE and create the necessary JSON and MD files for it."
-  (let ((date (shell "date +%Y-%m-%dT%R:%S%:z"))
+  (let* ((date (shell "date +%Y-%m-%dT%R:%S%:z"))
+        (slug (cl-ppcre:regex-replace-all ","
+                                          (cl-ppcre:regex-replace-all " " (string-downcase title) "-")
+                                          ""))
         (id (get-id))
-        (json-file (concat "./posts/" title ".json"))
-        (md-file (concat "./posts/" title ".md")))
+        (json-file (concat "./posts/" slug ".json"))
+        (md-file (concat "./posts/" slug ".md")))
     (write-file (json:encode-json-to-string `(("id" . ,id)
                                               ("published" . ,date)
                                               ("title" . ,title)

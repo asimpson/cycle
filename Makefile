@@ -8,3 +8,7 @@ ecl:
 clean:
 	rm cycle
 .PHONY: cycle
+
+install:
+	mv cycle /usr/local/bin/cycle
+.PHONY: install
