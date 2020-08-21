@@ -1,6 +1,7 @@
 language: lisp
 sudo: required
 
+dist: focal
 os:
   - linux
   - osx

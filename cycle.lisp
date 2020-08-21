@@ -40,7 +40,16 @@
   "Create list that contains the data from each JSON file combined with the body of every post."
   (let* ((json (uiop:read-file-string (car (cdr post))))
          (list-json (json:decode-json-from-string json)))
-    `(,@list-json (:content . ,(post-for-slug (cdr (assoc :slug list-json)))))))
+    `(,@list-json
+      (:published_pretty . ,(pretty-date (cdr (assoc :published list-json))))
+      (:modified_pretty . ,(pretty-date (cdr (assoc :modified list-json))))
+      (:content . ,(post-for-slug (cdr (assoc :slug list-json)))))))
+
+(defun pretty-date (date)
+  "Returns a pretty date given a date from a JSON file."
+  (local-time:format-timestring nil
+                                (local-time:parse-timestring date)
+                                :format '(:LONG-MONTH " " :DAY ", " :YEAR)))
 
 (defun full-path-as-string (dir)
   (namestring (truename dir)))
@@ -59,12 +68,6 @@
       (unless (uiop/filesystem:directory-exists-p (concat "site/" folder))
         (ensure-directories-exist (concat (full-path-as-string "site/") folder)))
       folder)))
-
-(defun parse-date (date)
-  (let ((month (local-time:format-timestring nil (local-time:parse-timestring date) :format '(:month)))
-        (year (local-time:format-timestring nil (local-time:parse-timestring date) :format '(:year)))
-        (day (local-time:format-timestring nil (local-time:parse-timestring date) :format '(:day))))
-    (concat year "-" month "-" day)))
 
 (defun write-file (contents file)
   "Write CONTENTS to FILE."
@@ -92,8 +95,8 @@
           (setf post `((:content . ,(cdr (assoc :content pair)))
                        (:pub_date . ,(cdr (assoc :published pair)))
                        (:mod_date . ,(cdr (assoc :modified pair)))
-                       (:modifiedDate . ,(parse-date (cdr (assoc :modified pair))))
-                       (:formattedDate . ,(parse-date (cdr (assoc :published pair))))
+                       (:modifiedDate . ,(pretty-date (cdr (assoc :modified pair))))
+                       (:formattedDate . ,(pretty-date (cdr (assoc :published pair))))
                        (:link . ,(cdr (assoc :link pair)))
                        (:description . ,(cdr (assoc :excerpt pair)))
                        (:slug . ,(concat "/writing/"
@@ -215,37 +218,9 @@
   (date-as-rfc-822 (local-time:format-timestring nil (local-time:now))))
 
 (defun date-as-rfc-822 (date)
-  (let ((year (local-time:format-timestring nil (local-time:parse-timestring date) :format '(:year)))
-        (month (local-time:format-timestring nil
-                                             (local-time:parse-timestring date)
-                                             :format '(:short-month)))
-        (day (local-time:format-timestring nil
-                                           (local-time:parse-timestring date)
-                                           :format '(:short-weekday)))
-        (date (return-leading-zero-as-string
-               (read-from-string
-                (local-time:format-timestring nil
-                                              (local-time:parse-timestring date)
-                                              :format '(:day)))))
-        (hour (return-leading-zero-as-string
-               (read-from-string
-                (local-time:format-timestring nil
-                                              (local-time:parse-timestring date)
-                                              :format '(:hour)))))
-        (minute (return-leading-zero-as-string
-                 (read-from-string
-                  (local-time:format-timestring nil
-                                                (local-time:parse-timestring date)
-                                                :format '(:min)))))
-        (seconds (return-leading-zero-as-string
-                  (read-from-string
-                   (local-time:format-timestring nil
-                                                 (local-time:parse-timestring date)
-                                                 :format '(:sec)))))
-        (tz (local-time:format-timestring nil
-                                          (local-time:parse-timestring date)
-                                          :format '(:gmt-offset-hhmm))))
-    (concat day ", " date " " month " " year " " hour ":" minute ":" seconds " " tz)))
+  (local-time:format-timestring nil
+                                (local-time:parse-timestring date)
+                                :format '(:short-weekday ", " :day " " :short-month " " :year " " :hour ":" :min ":" (:sec 2) " " :gmt-offset-hhmm)))
 
 (defun format-data-for-rss(post)
   (let ((slug (cdr (assoc :slug post))))
