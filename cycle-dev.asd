@@ -6,5 +6,4 @@
   :serial t
   :depends-on (:cycle
                :sqlite)
-  :components ((:file "cycle-dev-package")
-               (:file "cycle-dev")))
+  :components ((:file "cycle-dev")))

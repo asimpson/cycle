@@ -4,7 +4,7 @@
   :description "A opinionated static site builder."
   :author "Adam Simpson <adam@adamsimpson.net>"
   :license "GNU GPLv3"
-  :version "0.2.7"
+  :version "0.2.8"
   :serial t
   :depends-on (
     :local-time
@@ -14,7 +14,6 @@
     :3bmd
     :3bmd-ext-code-blocks
     :unix-opts)
-  :components ((:file "package")
-               (:file "cycle"))
+  :components ((:file "cycle"))
   :build-pathname "cycle"
   :entry-point "cycle:main")

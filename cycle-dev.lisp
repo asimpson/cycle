@@ -1,6 +1,11 @@
 ;;;; cycle-dev.lisp
 (require "asdf")
 
+(defpackage :cycle-dev
+  (:use
+    :cl
+    :cycle))
+
 (in-package :cycle-dev)
 
 (when (uiop:file-exists-p "BLOG")
