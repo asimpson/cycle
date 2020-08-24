@@ -229,7 +229,7 @@
 (defun date-as-rfc-822 (date)
   (local-time:format-timestring nil
                                 (local-time:parse-timestring date)
-                                :format '(:short-weekday ", " :day " " :short-month " " :year " " :hour ":" :min ":" (:sec 2) " " :gmt-offset-hhmm)))
+                                :format '(:short-weekday ", " :day " " :short-month " " :year " " (:hour 2) ":" (:min 2) ":" (:sec 2) " " :gmt-offset-hhmm)))
 
 (defun format-data-for-rss(post)
   (let ((slug (cdr (assoc :slug post))))
