@@ -21,5 +21,3 @@ Currently there are pre-built binaries for Linux and macOS in [[https://github.c
 *** Compile binary
 **** sbcl
 ~make~
-**** ecl
-~make ecl~
