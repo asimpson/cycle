@@ -316,6 +316,7 @@
           (setf css (uiop:read-file-string "site.css")))
         (setf mustache:*default-pathname-type* "mustache")
         (setf 3bmd-code-blocks:*code-blocks* t)
+        (setf 3bmd-code-blocks:*renderer* :pygments)
         (setf posts (reverse (sort (gen-data)
                                    'sort-by-ids
                                    :key 'car)))
