@@ -1,13 +1,17 @@
-language: lisp
-sudo: required
+language: python
+
+python:
+  - 3.6
 
 dist: xenial
+
 os:
   - linux
   - osx
 
 install:
   - ./ci/install.sh
+  - pip install -r requirements.txt
 
 script:
   - make cycle
@@ -17,7 +21,7 @@ before_deploy:
 
 deploy:
   provider: releases
-  api_key: $GITHUB_OAUTH_TOKEN
+  token: $GITHUB_OAUTH_TOKEN
   file: cycle-$TRAVIS_OS_NAME
   skip_cleanup: true
   on:
