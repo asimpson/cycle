@@ -4,7 +4,7 @@
   :description "A opinionated static site builder."
   :author "Adam Simpson <adam@adamsimpson.net>"
   :license "GNU GPLv3"
-  :version "0.2.11"
+  :version "0.2.12"
   :serial t
   :depends-on (
     :local-time
