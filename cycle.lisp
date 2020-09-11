@@ -328,7 +328,8 @@
           (setf css (uiop:read-file-string (concat cwd "site.css"))))
         (setf mustache:*default-pathname-type* "mustache")
         (setf 3bmd-code-blocks:*code-blocks* t)
-        (setf 3bmd-code-blocks:*renderer* :pygments)
+        (setf 3bmd-code-blocks:*chroma-style* "dracula")
+        (setf 3bmd-code-blocks:*renderer* :chroma)
         (setf posts (reverse (sort (gen-data)
                                    'sort-by-ids
                                    :key 'car)))
