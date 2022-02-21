@@ -21,10 +21,21 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/reposit
     cd cycle-master && \
     make
 
+RUN cd /src && curl -L -o chroma.tar.gz "https://github.com/alecthomas/chroma/releases/download/v0.10.0/chroma-0.10.0-linux-amd64.tar.gz"
+
+RUN tar -xvf chroma.tar.gz
+
 FROM alpine:edge
 
 WORKDIR /opt/bin
 
 COPY --from=builder /src/cycle-master/cycle .
+COPY --from=builder /src/chroma .
 
-CMD ["./cycle"]
+RUN mkdir /site
+
+WORKDIR /site
+
+ENV PATH="/opt/bin:${PATH}"
+
+CMD ["cycle"]
