@@ -1,23 +1,67 @@
 ** Cycle
 [[https://travis-ci.org/asimpson/cycle.svg?branch=master]]
 
-♻ A static site generator written in Common Lisp that works for me and probably no one else.
+♻ A Hugo theme ported from the Cycle static site generator.
 
-*** Folder structure
-#+BEGIN_SRC
-.
-├── pages
-├── posts
-├── public
-│   ├── images
-│   └── js
-└── templates
-    └── partials
+*** Overview
+Cycle is now a Hugo theme that maintains the same clean, minimal design as the original Common Lisp static site generator. The theme includes support for:
+- Blog posts with RSS feeds
+- Custom pages (e.g., /uses, /support)
+- Archive page listing all posts
+- Link posts with external URLs
+- Responsive design using Tachyons CSS
+
+*** Installation
+
+**** Using the theme in your Hugo site
+1. Add the theme to your Hugo site:
+   #+BEGIN_SRC bash
+   cd your-hugo-site
+   git submodule add https://github.com/asimpson/cycle.git themes/cycle
+   #+END_SRC
+
+2. Update your ~hugo.toml~ or ~config.toml~:
+   #+BEGIN_SRC toml
+   theme = "cycle"
+   
+   [permalinks]
+     post = "/writing/:slug/"
+   #+END_SRC
+
+3. Add CSS files to your site's ~assets/~ directory:
+   - ~tachyons.css~ - Main CSS framework
+   - ~custom.css~ - Site-specific styles
+
+**** Running the example site
+#+BEGIN_SRC bash
+cd themes/cycle/exampleSite
+hugo server
 #+END_SRC
 
-*** Pre-built binaries
-Currently there are pre-built binaries for Linux and macOS in [[https://github.com/asimpson/cycle/releases][Releases]].
+*** Content Structure
+- Posts go in ~content/post/~ with frontmatter:
+  #+BEGIN_SRC yaml
+  ---
+  title: "Post Title"
+  date: 2024-01-01T10:00:00-05:00
+  slug: post-slug
+  excerpt: "Post excerpt for listings and RSS"
+  ---
+  #+END_SRC
 
-*** Compile binary
-**** sbcl
-~make~
+- Pages go in ~content/page/~ with similar frontmatter
+- The archive page is created by adding ~content/archive/_index.md~
+
+*** Link Posts
+To create a link post (external link), add a ~link~ parameter to the frontmatter:
+#+BEGIN_SRC yaml
+---
+title: "External Article"
+date: 2024-01-01T10:00:00-05:00
+slug: external-article
+link: "https://example.com/article"
+---
+#+END_SRC
+
+*** Original Common Lisp Version
+The original Common Lisp static site generator has been replaced by this Hugo theme. If you need the legacy version, see git history or releases.
