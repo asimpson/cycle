@@ -1,0 +1,12 @@
+name = "Cycle"
+license = "GPLv3"
+licenselink = "https://github.com/asimpson/cycle/blob/master/LICENSE"
+description = "A Hugo theme ported from the Cycle static site generator"
+homepage = "https://github.com/asimpson/cycle"
+tags = ["blog", "minimal"]
+features = ["rss"]
+min_version = "0.110.0"
+
+[author]
+  name = "Adam Simpson"
+  homepage = "https://adamsimpson.net"

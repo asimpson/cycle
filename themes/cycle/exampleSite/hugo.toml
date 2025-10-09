@@ -1,0 +1,21 @@
+baseURL = "https://adamsimpson.net/"
+languageCode = "en-us"
+title = "adamsimpson.net"
+theme = "cycle"
+
+[params]
+  description = "The design and development log of Adam Simpson."
+
+[permalinks]
+  post = "/writing/:slug/"
+
+[outputs]
+  home = ["HTML", "RSS"]
+  section = ["HTML", "RSS"]
+
+[outputFormats.RSS]
+  mediatype = "application/rss+xml"
+  baseName = "rss"
+
+[services.rss]
+  limit = 20

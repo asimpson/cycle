@@ -1,0 +1,16 @@
+<article class="mw7 mh4">
+  <div>
+    {{ if .Params.link }}
+      <h1 class="black mb0"><a href="{{ .Params.link }}">{{ .Title }}</a></h1>
+    {{ else }}
+      <h1 class="black mb0">{{ .Title }}</h1>
+    {{ end }}
+    <time class="db f6 mb2 mt2" datetime="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">{{ .Date.Format "January 2, 2006" }}</time>
+    <div class="lh-copy measure-wide">
+      {{ .Content }}
+      <div class="bg-light-gray pa3">
+        Have a comment? <a href="mailto:~asimpson/public-inbox@lists.sr.ht?Subject=Re: {{ .Title }}">Send an email</a> to my <a href="https://lists.sr.ht/~asimpson/public-inbox">public inbox</a>. Please follow <a href="https://man.sr.ht/lists.sr.ht/etiquette.md">proper mail etiquette</a>.
+      </div>
+    </div>
+  </div>
+</article>

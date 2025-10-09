@@ -1,0 +1,14 @@
+{{ define "main" }}
+  {{ if eq .Type "post" }}
+    {{ partial "post_body.html" . }}
+    <footer>
+      <script async defer src="/js/twitter-widget.js"></script>
+    </footer>
+  {{ else }}
+    <div>
+      <article class="mw7 mh4">
+        {{ .Content }}
+      </article>
+    </div>
+  {{ end }}
+{{ end }}

@@ -1,0 +1,32 @@
+{{ define "main" }}
+<div class="black-90 b f2 mw7 mh4 mv5 lh-title">
+  <p>Hiya 👋</p>
+  <p>I'm Adam Simpson and I work on open source at <a class="dark-green dim" href="https://grafana.com/">Grafana</a> and live life with my wonderful wife Christi and our daughters Ellie, Ainsley, and Margot.</p>
+</div>
+<div class="mw7">
+  <h2 class="black-90 mh4 pa0">Recent Posts</h2>
+  <ul class="list pa0 mh4">
+    {{ range first 10 (where .Site.RegularPages "Type" "post") }}
+    <li class="mb4">
+      {{ if .Params.link }}
+        <div>
+          <a href="{{ .Params.link }}" class="mb1 b dark-green no-underline underline-hover">{{ .Title }}</a>
+        </div>
+      {{ else }}
+        <a href="{{ .RelPermalink }}" class="mb1 b dark-green no-underline underline-hover">{{ .Title }}</a>
+      {{ end }}
+      <div>{{ .Date.Format "January 2, 2006" }}</div>
+      <div class="lh-copy mt2 measure-wide">
+        {{ if .Params.link }}
+          {{ .Content }}
+          <a class="db dark-green no-underline underline-hover" href="{{ .RelPermalink }}">🔗 Permalink</a>
+        {{ else }}
+          {{ .Params.excerpt }}
+        {{ end }}
+      </div>
+    </li>
+    {{ end }}
+  </ul>
+  <div class="ml4"><a class="dark-green" href="/archive">Archive</a> →</div>
+</div>
+{{ end }}

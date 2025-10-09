@@ -1,0 +1,24 @@
+{{ define "main" }}
+<div>
+  <ul class="list mw7 pa0 ml4 mr4">
+    {{ range (where .Site.RegularPages "Type" "post") }}
+    <li class="mb4">
+      {{ if .Params.link }}
+        <a href="{{ .Params.link }}" class="mb1 b dark-green no-underline underline-hover">{{ .Title }}</a>
+      {{ else }}
+        <a href="{{ .RelPermalink }}" class="mb1 b dark-green no-underline underline-hover">{{ .Title }}</a>
+      {{ end }}
+      <div>{{ .Date.Format "January 2, 2006" }}</div>
+      <div class="measure-wide lh-copy mt2">
+        {{ if .Params.link }}
+          {{ .Content }}
+          <a class="db dark-green no-underline underline-hover" href="{{ .RelPermalink }}">🔗 Permalink</a>
+        {{ else }}
+          {{ .Params.excerpt }}
+        {{ end }}
+      </div>
+    </li>
+    {{ end }}
+  </ul>
+</div>
+{{ end }}

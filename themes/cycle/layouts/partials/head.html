@@ -1,0 +1,48 @@
+<head>
+  <meta charset="utf-8">
+  {{ if .Title }}
+    <title>{{ .Title }}</title>
+  {{ else }}
+    <title>{{ .Site.Title }}</title>
+  {{ end }}
+  {{ with .Params.excerpt }}
+    {{ if $.Params.link }}
+      <meta name="description" content="Link to: {{ $.Params.link }}">
+    {{ else }}
+      <meta name="description" content="{{ . }}">
+    {{ end }}
+  {{ else }}
+    <meta name="description" content="{{ .Site.Params.description }}">
+  {{ end }}
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,shrink-to-fit=no">
+  <link href="{{ "rss.xml" | absURL }}" title="{{ .Site.Title }}" rel="alternate" type="application/rss+xml">
+  <link href="https://micro.blog/simpson" rel="me" />
+  <link href="https://twitter.com/a_simpson" rel="me" />
+  <link href="https://github.com/asimpson" rel="me" />
+  <link rel="pgpkey" href="/key.pub">
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:site" content="@a_simpson" />
+  {{ if .Title }}
+    <meta name="twitter:title" content="{{ .Title }}" />
+  {{ else }}
+    <meta name="twitter:title" content="{{ .Site.Title }}" />
+  {{ end }}
+  {{ with .Params.excerpt }}
+    {{ if $.Params.link }}
+      <meta name="twitter:description" content="Link to: {{ $.Params.link }}" />
+    {{ else }}
+      <meta name="twitter:description" content="{{ . }}" />
+    {{ end }}
+  {{ else }}
+    <meta name="twitter:description" content="{{ .Site.Params.description }}" />
+  {{ end }}
+  <link rel='canonical' href="{{ .Permalink }}">
+  <style>
+    {{ $tachyons := resources.Get "tachyons.css" }}
+    {{ $custom := resources.Get "custom.css" }}
+    {{ if $tachyons }}{{ $tachyons.Content | safeCSS }}{{ end }}
+    {{ if $custom }}{{ $custom.Content | safeCSS }}{{ end }}
+  </style>
+</head>

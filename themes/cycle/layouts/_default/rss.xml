@@ -1,0 +1,51 @@
+{{- $pctx := . -}}
+{{- if .IsHome -}}{{ $pctx = .Site }}{{- end -}}
+{{- $pages := slice -}}
+{{- if or $.IsHome $.IsSection -}}
+{{- $pages = (where $pctx.RegularPages "Type" "post") -}}
+{{- end -}}
+{{- $limit := .Site.Config.Services.RSS.Limit -}}
+{{- if ge $limit 1 -}}
+{{- $pages = $pages | first $limit -}}
+{{- else -}}
+{{- $pages = $pages | first 20 -}}
+{{- end -}}
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>{{ .Site.Title }} Post Feed</title>
+    <link>{{ .Site.BaseURL }}</link>
+    <description>Last 20 posts for {{ .Site.Title }}</description>
+    <lastBuildDate>{{ now.Format "Mon, 02 Jan 2006 15:04:05 -0700" }}</lastBuildDate>
+    <language>en-us</language>
+
+    {{- range $pages }}
+      <item>
+        <title>{{ .Title }}</title>
+        {{- if .Params.link }}
+          <link>{{ .Params.link }}</link>
+        {{- else }}
+          <link>{{ .Permalink }}</link>
+        {{- end }}
+
+        <guid>{{ .Permalink }}</guid>
+        <pubDate>{{ .Date.Format "Mon, 02 Jan 2006 15:04:05 -0700" }}</pubDate>
+
+        {{- if not .Params.link }}
+          <description>
+            <![CDATA[ {{ .Params.excerpt }} ]]>
+          </description>
+          <content:encoded><![CDATA[
+            {{ .Content }}
+            <a href="mailto:~asimpson/public-inbox@lists.sr.ht?Subject=Re: {{ .Title }}">Discuss further in my public inbox</a>
+          ]]></content:encoded>
+        {{- else }}
+          <content:encoded><![CDATA[
+            {{ .Content }}
+            <a title="permalink for {{ .Title }}" href="{{ .Permalink }}">🔗</a>
+            <a href="mailto:~asimpson/public-inbox@lists.sr.ht?Subject=Re: {{ .Title }}">Discuss further in my public inbox</a>
+          ]]></content:encoded>
+        {{- end }}
+      </item>
+    {{- end }}
+  </channel>
+</rss>

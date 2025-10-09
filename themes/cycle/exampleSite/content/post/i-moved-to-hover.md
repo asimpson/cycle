@@ -1,0 +1,14 @@
+---
+title: "I moved to Hover"
+date: 2012-09-09T03:01:02-04:00
+lastmod: 2015-03-21T19:45:37-04:00
+slug: i-moved-to-hover
+excerpt: "I switched from GoDaddy to Hover.
+"
+---
+
+In case you didn't hear, [Anonymous broke GoDaddy today](http://techcrunch.com/2012/09/10/godaddy-outage-takes-down-millions-of-sites/). I figured now would be as good a time as any to explain why I moved away from GoDaddy a few weeks ago.
+
+I chose [Hover](https://www.hover.com/) to be my GoDaddy replacement. I've never hosted anything through GoDaddy (I'm not a crazy person), but I did manage all my domain names through them. [Hover](https://www.hover.com/) and GoDaddy could not be more different, GoDaddy's interface is comedically awful, Hover's interface is relatively simple and light - two words you never, ever hear about GoDaddy's administrative panels. I figure that 90% of using a DNS service is spent in front of their admin interface, it counts to have a good one.
+
+I would highly recommend switching from GoDaddy to [Hover](https://www.hover.com/), or [Namecheap](http://www.namecheap.com/), or [DNS Simple](https://dnsimple.com/), the point is to switch *away from* GoDaddy not really where you switch to. So take the leap, and stop feeling sad inside when you hear another joke about GoDaddy.

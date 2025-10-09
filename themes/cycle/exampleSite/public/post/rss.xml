@@ -1,0 +1,738 @@
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>adamsimpson.net Post Feed</title>
+    <link>https://adamsimpson.net/</link>
+    <description>Last 20 posts for adamsimpson.net</description>
+    <lastBuildDate>Thu, 09 Oct 2025 21:22:39 &#43;0000</lastBuildDate>
+    <language>en-us</language>
+      <item>
+        <title>nixpkgs is a treasure</title>
+          <link>https://adamsimpson.net/writing/nixpkgs-is-a-treasure/</link>
+
+        <guid>https://adamsimpson.net/writing/nixpkgs-is-a-treasure/</guid>
+        <pubDate>Fri, 10 May 2024 14:07:43 -0400</pubDate>
+          <description>
+            &lt;![CDATA[ Nix and NixOS continue to be the best way to manage and build software that I&#39;ve found. ]]>
+          </description>
+          <content:encoded>&lt;![CDATA[
+            <p>Nix and NixOS continue to be the best way to manage and build software that I&rsquo;ve found. Every project has a <code>shell.nix</code> file in the root where I can define the specific software needed to work on that project along with any necessary environment variables or <code>$PATH</code> modifications. I ran into an issue this week though where I needed an &ldquo;old&rdquo; version of Go (<code>1.20</code>) but the version had already been <a href="https://github.com/NixOS/nixpkgs/tree/2e31c3a7e9825ec1ef087b5db2b801e1a9fb6f3b/pkgs/development/compilers/go">removed from <code>nixpkgs</code></a>. How can I pull in an &ldquo;unlisted&rdquo; version into my <code>shell.nix</code>?</p>
+<p>It&rsquo;s actually pretty straightforward, utilize <a href="https://nixos.org/manual/nix/stable/language/builtins.html?highlight=fetchtarball#builtins-fetchTarball"><code>fetchTarball</code></a> to pull in <code>nixpkgs</code> based on a commit where the version was present sometime in the past. You can mix that <code>import</code> in with regular/&ldquo;current&rdquo; packages with no issue like so:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{ pkgs <span style="color:#f92672">?</span> <span style="color:#f92672">import</span> <span style="color:#e6db74">&lt;nixpkgs&gt;</span> {} }:
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> oldGo <span style="color:#f92672">=</span> <span style="color:#f92672">import</span> (builtins<span style="color:#f92672">.</span>fetchTarball {
+</span></span><span style="display:flex;"><span>    url <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://github.com/NixOS/nixpkgs/archive/33c51330782cb486764eb598d5907b43dc87b4c2.tar.gz&#34;</span>;
+</span></span><span style="display:flex;"><span>    sha256 <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;sha256:0nflmpfp3pk704vhlvlgh5vgwl8qciqi18mcpl32k79qjziwmih8&#34;</span>;
+</span></span><span style="display:flex;"><span>    }) {};
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">in</span> 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>pkgs<span style="color:#f92672">.</span>mkShell {
+</span></span><span style="display:flex;"><span>  buildInputs <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    oldGo<span style="color:#f92672">.</span>go_1_20
+</span></span><span style="display:flex;"><span>    pkgs<span style="color:#f92672">.</span>gopls
+</span></span><span style="display:flex;"><span>    pkgs<span style="color:#f92672">.</span>nodejs_18
+</span></span><span style="display:flex;"><span>  ];
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  hardeningDisable <span style="color:#f92672">=</span> [ <span style="color:#e6db74">&#34;fortify&#34;</span> ];
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  shellHook <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    mkdir -p .go .npm
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    export GOPATH=$PWD/.go
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    export NODE_PATH=$PWD/.npm
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    export NPM_CONFIG_PREFIX=$NODE_PATH
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    export PATH=$PWD/.yarn/sdks/typescript/bin:$PWD/.go/bin:$PATH:$NODE_PATH/bin
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  &#39;&#39;</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Notice I can reference the &ldquo;<code>nixpkgs</code>&rdquo; tarball/snapshot, <code>oldGo</code>, and pull in the version of Go I need?! <code>nixpkgs</code> is such a treasure trove of software, it&rsquo;s absolutely incredible!</p>
+
+            <a href="mailto:~asimpson/public-inbox@lists.sr.ht?Subject=Re: nixpkgs%20is%20a%20treasure">Discuss further in my public inbox</a>
+          ]]></content:encoded>
+      </item>
+      <item>
+        <title>Lessons learned from integrating OpenAI into a Grafana data source</title>
+          <link>https://adamsimpson.net/writing/lessons-learned-from-integrating-openai-into-a-grafana-data-source/</link>
+
+        <guid>https://adamsimpson.net/writing/lessons-learned-from-integrating-openai-into-a-grafana-data-source/</guid>
+        <pubDate>Tue, 25 Jul 2023 15:10:24 -0400</pubDate>
+          <description>
+            &lt;![CDATA[ I wrote over on the &lt;a href=&#34;https://grafana.com/blog/&#34;&gt;Grafana blog&lt;/a&gt; about a few &lt;a href=&#34;https://grafana.com/blog/2023/07/25/lessons-learned-from-integrating-openai-into-a-grafana-data-source/&#34;&gt;lessons or observations we learned while integrating OpenAI into the ADX data source&lt;/a&gt;. It&#39;s my first post on the Grafana blog and I&#39;m pretty excited, so check it out! ]]>
+          </description>
+          <content:encoded>&lt;![CDATA[
+            <p>I wrote over on the <a href="https://grafana.com/blog/">Grafana blog</a> about a few <a href="https://grafana.com/blog/2023/07/25/lessons-learned-from-integrating-openai-into-a-grafana-data-source/">lessons or observations we learned while integrating OpenAI into the ADX data source</a>. It&rsquo;s my first post on the Grafana blog and I&rsquo;m pretty excited, so check it out!</p>
+
+            <a href="mailto:~asimpson/public-inbox@lists.sr.ht?Subject=Re: Lessons%20learned%20from%20integrating%20OpenAI%20into%20a%20Grafana%20data%20source">Discuss further in my public inbox</a>
+          ]]></content:encoded>
+      </item>
+      <item>
+        <title>Better scripting with gh</title>
+          <link>https://adamsimpson.net/writing/better-scripting-with-gh/</link>
+
+        <guid>https://adamsimpson.net/writing/better-scripting-with-gh/</guid>
+        <pubDate>Sat, 22 Jul 2023 11:33:16 -0400</pubDate>
+          <description>
+            &lt;![CDATA[ I&#39;ve become a big fan of the &lt;a href=&#34;https://cli.github.com/&#34;&gt;gh&lt;/a&gt; CLI tool from Github. It has eliminated the need for me to manage developer tokens for my scripts. ]]>
+          </description>
+          <content:encoded>&lt;![CDATA[
+            <p>I&rsquo;ve become a big fan of the <a href="https://cli.github.com/">gh</a> CLI tool from Github. It has eliminated the need for me to manage developer tokens for my scripts. Instead of using <code>curl</code> with a Github token and the Github API, I can simply use <code>gh</code>. What&rsquo;s even better is that in more advanced situations where there isn&rsquo;t a valid subcommand for what I want to script, I can use the <a href="https://cli.github.com/manual/gh_api"><code>gh api</code></a> escape hatch to do <code>curl</code>-style HTTP requests to the API without messing with authentication or even pagination. Here are two recent scripts I wrote that highlight the power and convenience of <code>gh</code>.</p>
+<h2 id="pr-kudos">PR Kudos</h2>
+<p>I created this script to help me give better kudos to folks in our retro meeting. When I provide a Github team name as an argument, it displays all PRs from members of that team. What I really like is that it only shows PRs from the last two weeks, which gives me a nice overview of recent activity.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e">#!/bin/bash
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>start<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>date -d <span style="color:#e6db74">&#34;2 weeks ago&#34;</span> +%Y-%m-%d<span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span>end<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>date +%Y-%m-%d<span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>details<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>gh api /orgs/grafana/teams/$1 | jq -r <span style="color:#e6db74">&#39;&#34;\(.id),\(.organization.id)&#34;&#39;</span><span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span>teamId<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>echo <span style="color:#e6db74">${</span>details<span style="color:#e6db74">}</span> | cut -d , -f 1<span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span>orgId<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>echo <span style="color:#e6db74">${</span>details<span style="color:#e6db74">}</span> | cut -d , -f 2<span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>gh api <span style="color:#e6db74">&#34;organizations/</span><span style="color:#e6db74">${</span>orgId<span style="color:#e6db74">}</span><span style="color:#e6db74">/team/</span><span style="color:#e6db74">${</span>teamId<span style="color:#e6db74">}</span><span style="color:#e6db74">/members&#34;</span> | <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  jq -r <span style="color:#e6db74">&#39;.[] | .login&#39;</span> | <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  xargs -I % gh search prs --author<span style="color:#f92672">=</span>% --created<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>start<span style="color:#e6db74">}</span><span style="color:#e6db74">..</span><span style="color:#e6db74">${</span>end<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  --json<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;state,repository,url,title,updatedAt,author&#34;</span> --template <span style="color:#e6db74">&#39;{{range .}}{{tablerow (.author.login | autocolor &#34;green&#34;) (hyperlink .url .title) (.repository.name | autocolor &#34;blue&#34;) (.state | autocolor &#34;red&#34;) (timeago .updatedAt)}}{{end}}
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">{{tablerender}}&#39;</span>
+</span></span></code></pre></div><h2 id="notification-ocd">Notification OCD</h2>
+<p>The second script focuses on managing notifications related to pull requests and issues. I usually find that about one-third of my notifications are for merged PRs, PRs created by bots, or closed Issues. I don&rsquo;t care about these types of events. With this script, I can mark those notifications as done, which reduces clutter in my GitHub notifications and helps me see important updates. As I mentioned above, one cool feature of the <code>api</code> subcommand is that it allows me to consume all possible pages of a response using the <code>--paginate</code> flag, eliminating the need for a loop + token field dance!</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e">#!/bin/bash
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>declare -A typeLookup
+</span></span><span style="display:flex;"><span>typeLookup<span style="color:#f92672">[</span><span style="color:#e6db74">&#34;PullRequest&#34;</span><span style="color:#f92672">]=</span><span style="color:#e6db74">&#34;pull&#34;</span>
+</span></span><span style="display:flex;"><span>typeLookup<span style="color:#f92672">[</span><span style="color:#e6db74">&#34;Issue&#34;</span><span style="color:#f92672">]=</span><span style="color:#e6db74">&#34;issues&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>resp<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>gh api /notifications --paginate | jq -r <span style="color:#e6db74">&#39;.[] | select(.subject.type == &#34;PullRequest&#34; or .subject.type == &#34;Issue&#34;) | &#34;\(.repository.full_name),\(.subject.url),\(.id),\(.subject.type)&#34;&#39;</span><span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> x in $resp; <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>  name<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>x<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> | cut -d <span style="color:#e6db74">&#39;,&#39;</span> -f 1<span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span>  id<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>x<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> | cut -d <span style="color:#e6db74">&#39;,&#39;</span> -f 3<span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span>  number<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>basename <span style="color:#66d9ef">$(</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>x<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> | cut -d <span style="color:#e6db74">&#39;,&#39;</span> -f 2<span style="color:#66d9ef">))</span>
+</span></span><span style="display:flex;"><span>  ofType<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>x<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> | cut -d <span style="color:#e6db74">&#39;,&#39;</span> -f 4<span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span>  urlType<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>echo <span style="color:#e6db74">${</span>typeLookup[<span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>ofType<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>]<span style="color:#e6db74">}</span><span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span>  isBot<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;false&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>ofType<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;PullRequest&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>    isMerged<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>gh pr view --repo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>number<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> --json closed | jq -r .closed<span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span>    isBot<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>gh pr view --repo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>number<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> --json author | jq -r .author.is_bot<span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>ofType<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;Issue&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>    isMerged<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>gh issue view --repo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>number<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> --json closed | jq -r .closed<span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>isMerged<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;true&#34;</span> <span style="color:#f92672">]</span> <span style="color:#f92672">||</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>isBot<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;true&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>    echo <span style="color:#e6db74">&#34;marking https://github.com/</span><span style="color:#e6db74">${</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">${</span>urlType<span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">${</span>number<span style="color:#e6db74">}</span><span style="color:#e6db74"> as done...&#34;</span>
+</span></span><span style="display:flex;"><span>    gh api -X PATCH <span style="color:#e6db74">&#34;/notifications/threads/</span><span style="color:#e6db74">${</span>id<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">done</span>
+</span></span></code></pre></div>
+            <a href="mailto:~asimpson/public-inbox@lists.sr.ht?Subject=Re: Better%20scripting%20with%20gh">Discuss further in my public inbox</a>
+          ]]></content:encoded>
+      </item>
+      <item>
+        <title>End of an era</title>
+          <link>https://adamsimpson.net/writing/end-of-an-era/</link>
+
+        <guid>https://adamsimpson.net/writing/end-of-an-era/</guid>
+        <pubDate>Thu, 15 Jun 2023 14:13:50 -0400</pubDate>
+          <description>
+            &lt;![CDATA[ Today I removed two of my most-used apps on my phone, &lt;a href=&#39;https://apolloapp.io/&#39;&gt;Apollo&lt;/a&gt; and &lt;a href=&#39;https://tapbots.com/tweetbot/&#39;&gt;Tweetbot&lt;/a&gt;. It feels like the end of an era. ]]>
+          </description>
+          <content:encoded>&lt;![CDATA[
+            <p>Today I removed two of my most-used apps on my phone, <a href="https://apolloapp.io/">Apollo</a> and <a href="https://tapbots.com/tweetbot/">Tweetbot</a>. It feels like the end of an era.</p>
+<p>Twitter and Reddit were both social websites that are/were terrible without a lot of cultivation and effort, but over the years I had shaped my experience on those services to be pretty good thanks in large part to Apollo and Tweetbot being such powerful tools.</p>
+<p>Ironically the only social web thing I still use (outside of Instagram) is <a href="https://feedbin.com/">RSS</a>. I will probably spin up a Mastodon instance here eventually but for now I&rsquo;ve subscribed to folks via Mastodon&rsquo;s RSS support and it&rsquo;s good enough for now.</p>
+<p>I guess I just wanted to give a shout out to the devs of Apollo and Tweetbot: thank you for making such great apps, I will miss them.</p>
+
+            <a href="mailto:~asimpson/public-inbox@lists.sr.ht?Subject=Re: End%20of%20an%20era">Discuss further in my public inbox</a>
+          ]]></content:encoded>
+      </item>
+      <item>
+        <title>Hacking on Grafana with Web Assembly</title>
+          <link>https://adamsimpson.net/writing/hacking-on-grafana-with-web-assembly/</link>
+
+        <guid>https://adamsimpson.net/writing/hacking-on-grafana-with-web-assembly/</guid>
+        <pubDate>Fri, 19 Aug 2022 15:10:19 -0400</pubDate>
+          <description>
+            &lt;![CDATA[ Grafana had a hack week this past week and I opted to work on WebAssembly(WASM)-related things. My vague original idea was to see if I could compile the Grafana server for WASM. ]]>
+          </description>
+          <content:encoded>&lt;![CDATA[
+            <!-- raw HTML omitted -->
+<p>The original inspiration for this idea came from <a href="https://simonwillison.net/2022/May/4/datasette-lite/">Simon Willison’s work with Datasette Lite</a>. However, compiling Grafana as a WASM binary proved <a href="https://github.com/golang/go/issues/32548">difficult</a> with existing <a href="https://pkg.go.dev/go/build#hdr-Build_Constraints">build constraints</a>. After spending some time trying to get that to work I changed course a bit and instead focused on compiling a basic <code>go</code> HTTP server as a WASM module. The new goal being to have a proof of concept that bundled the HTTP server as a WASM binary and intercepted any clicked links on the page and finally passed those links to be resolved by the <code>go</code> server in WASM.</p>
+<p>I used a <a href="https://developer.mozilla.org/en-US/docs/WebAssembly/Concepts">Web Worker</a> to interact with the WASM binary. This frees up the main thread of the browser. To put the WASM binary into the worker I loaded the binary and sent a message that contained the binary as a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Module"><code>WebAssembly.Module</code></a>.</p>
+<p>The Web Worker can then call any <code>go</code> functions that have been exposed via <a href="https://pkg.go.dev/syscall/js#FuncOf"><code>FuncOf</code></a>. Once the <code>go</code> function returns data, the worker posts that response back to the main thread via another message.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> <span style="color:#a6e22e">module</span>;
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">importScripts</span>(<span style="color:#e6db74">&#34;wasm_exec.js&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">go</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Go</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">self</span>.<span style="color:#a6e22e">onmessage</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">async</span> (<span style="color:#a6e22e">e</span>) =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">type</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;module&#34;</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">module</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">module</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">module</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;Message received: &#39;</span>, <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">path</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">instance</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> <span style="color:#a6e22e">WebAssembly</span>.<span style="color:#a6e22e">instantiate</span>(<span style="color:#a6e22e">module</span>, <span style="color:#a6e22e">go</span>.<span style="color:#a6e22e">importObject</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">go</span>.<span style="color:#a6e22e">run</span>(<span style="color:#a6e22e">instance</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">postMessage</span>(<span style="color:#a6e22e">parsePath</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">path</span>)); <span style="color:#75715e">// parsePath is exposed via FuncOf
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Sidenote: I wish <code>go</code> could use the same pragma syntax <code>tinygo</code> uses to expose functions instead of the verbose <code>FuncOf</code>. There&rsquo;s <a href="https://github.com/golang/go/issues/25612">an issue</a> but it has been open since 2018.</p>
+<p>Obviously, there is no <code>localhost</code> to listen on in a WASM environment. To get around that I created a bare bones <a href="https://pkg.go.dev/net/http#ResponseWriter"><code>ResponseWriter</code></a> and used that with the <a href="https://pkg.go.dev/net/http#Request"><code>Request</code></a> to run the Handler’s <a href="https://pkg.go.dev/net/http#HandlerFunc.ServeHTTP"><code>ServeHTTP</code></a> function which consults the routes that are defined and runs the matching handler code. This allowed me to use a build constraint (<code>setup.go</code> and <code>setup_js.go</code>) and keep my HTTP server functioning normally when run from a terminal but then also worked when run in a WASM context. Here&rsquo;s what those two files look like:</p>
+<p><code>setup</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#75715e">//go:build !js
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// +build !js
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> (
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;net/http&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">setup</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">s</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">NewServer</span>()
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ListenAndServe</span>(<span style="color:#e6db74">&#34;:9001&#34;</span>, <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">mux</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;error: &#34;</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><code>setup_js</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> (
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;bytes&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;io/ioutil&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;net/http&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;syscall/js&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">ResponseWriter</span> <span style="color:#66d9ef">struct</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Body</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">bytes</span>.<span style="color:#a6e22e">Buffer</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">r</span> <span style="color:#a6e22e">ResponseWriter</span>) <span style="color:#a6e22e">Header</span>() <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Header</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> make(<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Header</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">r</span> <span style="color:#a6e22e">ResponseWriter</span>) <span style="color:#a6e22e">Write</span>(<span style="color:#a6e22e">buf</span> []<span style="color:#66d9ef">byte</span>) (<span style="color:#66d9ef">int</span>, <span style="color:#66d9ef">error</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">Body</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">Body</span>.<span style="color:#a6e22e">Write</span>(<span style="color:#a6e22e">buf</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> len(<span style="color:#a6e22e">buf</span>), <span style="color:#66d9ef">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">r</span> <span style="color:#a6e22e">ResponseWriter</span>) <span style="color:#a6e22e">WriteHeader</span>(<span style="color:#a6e22e">statusCode</span> <span style="color:#66d9ef">int</span>) {}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">createWriter</span>() <span style="color:#a6e22e">ResponseWriter</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ResponseWriter</span>{
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">Body</span>: new(<span style="color:#a6e22e">bytes</span>.<span style="color:#a6e22e">Buffer</span>),
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">parsePath</span>(<span style="color:#a6e22e">this</span> <span style="color:#a6e22e">js</span>.<span style="color:#a6e22e">Value</span>, <span style="color:#a6e22e">args</span> []<span style="color:#a6e22e">js</span>.<span style="color:#a6e22e">Value</span>) <span style="color:#66d9ef">interface</span>{} {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;args: &#34;</span>, <span style="color:#a6e22e">args</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">server</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">NewServer</span>()
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">path</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">args</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">String</span>()
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">req</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">NewRequest</span>(<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">MethodGet</span>, <span style="color:#a6e22e">path</span>, <span style="color:#66d9ef">nil</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;request error: &#34;</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">h</span>, <span style="color:#a6e22e">p</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">server</span>.<span style="color:#a6e22e">mux</span>.<span style="color:#a6e22e">Handler</span>(<span style="color:#a6e22e">req</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;pattern: &#34;</span>, <span style="color:#a6e22e">p</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">w</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">createWriter</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">ServeHTTP</span>(<span style="color:#a6e22e">w</span>, <span style="color:#a6e22e">req</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">b</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">ioutil</span>.<span style="color:#a6e22e">ReadAll</span>(<span style="color:#a6e22e">w</span>.<span style="color:#a6e22e">Body</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;ioutil error: &#34;</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> string(<span style="color:#a6e22e">b</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">setup</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">js</span>.<span style="color:#a6e22e">Global</span>().<span style="color:#a6e22e">Set</span>(<span style="color:#e6db74">&#34;parsePath&#34;</span>, <span style="color:#a6e22e">js</span>.<span style="color:#a6e22e">FuncOf</span>(<span style="color:#a6e22e">parsePath</span>))
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="conclusions">Conclusions</h2>
+<p>The PoC worked! It&rsquo;s pretty slick to see a HTTP server running in WASM return back the correct data when a link is clicked. However, in my opinion, WASM continues to be a &ldquo;solution in search of a problem&rdquo;. Yes it&rsquo;s incredibly cool technology but so are the JS engines in Chrome, Firefox, and Safari. The sheer amount of money and engineering time being spent on making JS fast is a race no other technology can win at the moment.</p>
+<p>That said, Go seems to have done decent work at providing the necessary pieces to make compiling to WASM not awful.</p>
+<p>Honestly, the thing that surprised and impressed me the most was working with Web Workers. They are seriously useful and seem to &ldquo;just work&rdquo;.</p>
+<h2 id="links-that-helped-me-out-along-the-way">Links that helped me out along the way</h2>
+<ul>
+<li><a href="https://simonwillison.net/2022/May/4/datasette-lite/">Simon Willison’s post about Datasette Lite</a></li>
+<li><a href="https://blog.suborbital.dev/foundations-wasm-in-golang-is-fantastic">Philippe Charrière&rsquo;s post</a></li>
+<li><a href="https://itnext.io/webassemply-with-golang-by-scratch-e05ec5230558">Roman Romadin&rsquo;s post</a></li>
+</ul>
+
+            <a href="mailto:~asimpson/public-inbox@lists.sr.ht?Subject=Re: Hacking%20on%20Grafana%20with%20Web%20Assembly">Discuss further in my public inbox</a>
+          ]]></content:encoded>
+      </item>
+      <item>
+        <title>New workstation</title>
+          <link>https://adamsimpson.net/writing/new-workstation/</link>
+
+        <guid>https://adamsimpson.net/writing/new-workstation/</guid>
+        <pubDate>Mon, 02 May 2022 18:14:25 &#43;0000</pubDate>
+          <description>
+            &lt;![CDATA[ I detail my new workstation build featuring the Intel i5-12600k. ]]>
+          </description>
+          <content:encoded>&lt;![CDATA[
+            <p><a href="/writing/goodbye-sparkbox">New job</a> means time for a new workstation.</p>
+<h2 id="some-history">Some history</h2>
+<p>The first computer I ever purchased was the <a href="https://everymac.com/systems/apple/powerbook_g4/specs/powerbook_g4_1.5_12.html">12&quot; Powerbook G4</a>. Since that Powerbook I&rsquo;ve always had laptops as my main machines (desktop gaming PC not withstanding). Remote working the last few years has made me realize that the portability of a laptop is largely wasted since I only travel a handful of times a year and yet I live with the downsides of a laptop the rest of the time. So, last year I started thinking about a desktop machine for my primary workstation. A desktop is appealing for a handful of reasons:</p>
+<ul>
+<li>More powerful CPUs</li>
+<li>More expansion capabilities</li>
+<li>More durable</li>
+</ul>
+<h2 id="the-options">The options</h2>
+<p>The <a href="https://www.apple.com/mac-studio/">Mac Studio</a> was recently released to much fanfare and was really intriguing to me. However, when I started considering it I only had about a week to 10 days before my start date at <a href="https://grafana.com">Grafana</a> and I couldn&rsquo;t wait the quoted 4-6 weeks delivery time for a Mac Studio with 32GB of RAM.</p>
+<p>I was also pretty unwilling to leave my comfy <a href="https://nixos.org">NixOS</a> install + <a href="https://i3wm.org/">i3</a>. <a href="https://michael.stapelberg.ch/posts/2022-01-15-high-end-linux-pc/">Michael Stapelberg&rsquo;s latest post</a> about his new workstation proved timely and convinced me to give the new Intel Alder Lake CPUs a shot.</p>
+<p>Apple&rsquo;s M1 family of chips deliver incredible performance per watt but I wasn&rsquo;t as concered about the power usage given this was a desktop machine not a laptop. I was however focused on at least matching the M1 chips in single-threaded performance since a good chunk of my development work (Node, build tools, etc) are still single-threaded. I ended up with the Intel i5-12600k and I really couldn&rsquo;t be happier. Here&rsquo;s the full parts list:</p>
+<!-- raw HTML omitted -->
+<h2 id="xmp-issues">XMP issues</h2>
+<p>I ran into the same memory XMP issues that Michael mentions in his post so I disabled the XMP profile and the system passed the &ldquo;<a href="https://blog.codinghorror.com/is-your-computer-stable/">Coding Horror burn in tests</a>&rdquo; with flying colors.</p>
+<h2 id="cooling">Cooling</h2>
+<p>I mounted the 140mm fan to the bottom of the case as intake and the CPU cooler is of course positioned as intake as well. Hot air rises out the top of the case quite well. During the prime95 torture test the CPU never got over 78°C and I couldn&rsquo;t ever hear either fan. I run both fans in the &ldquo;silent profile&rdquo; in the BIOS and I use <a href="https://noctua.at/en/na-src7">Noctua&rsquo;s adapters</a> to lower the voltage even more. Now the only fan I could hear during max load was the PSU fan which doesn&rsquo;t spin at all under low to medium loads but under high load it kicks on. Day to day it&rsquo;s hardly on so the system is dead quiet most of the time.</p>
+<h2 id="case">Case</h2>
+<p>I absolutely love the Cerberus case. It&rsquo;s Mini-ATX but still super compact and fits on my desk quite well. All the panels are solid metal and the way all the panels pop off is really really nice. I opted for the handle mount on the top and the internal PSU moutning.</p>
+<h2 id="linux">Linux</h2>
+<p>NixOS <a href="https://github.com/asimpson/dotfiles/blob/master/nixos/fin/configuration.nix">installed just fine</a>. I&rsquo;m runing the 5.17 kernel because Alder Lake needs a newer kernel for it&rsquo;s graphics and CPU scheduler (coming soon?). I have WiFi and Bluetooh disabled in the BIOS since everything is hard-wired to the machine.</p>
+<h2 id="verdict">Verdict</h2>
+<p>This build has proven quite comfortable over the few weeks I&rsquo;ve used it. I love that I have 2 free RAM slots if I ever feel the need for more RAM. I also love that I have 3 remaining Nvme slots on the motherboard for additional solid state storage in the future.</p>
+
+            <a href="mailto:~asimpson/public-inbox@lists.sr.ht?Subject=Re: New%20workstation">Discuss further in my public inbox</a>
+          ]]></content:encoded>
+      </item>
+      <item>
+        <title>👋 Sparkbox</title>
+          <link>https://adamsimpson.net/writing/goodbye-sparkbox/</link>
+
+        <guid>https://adamsimpson.net/writing/goodbye-sparkbox/</guid>
+        <pubDate>Fri, 01 Apr 2022 18:20:31 &#43;0000</pubDate>
+          <description>
+            &lt;![CDATA[ I can’t believe I’m writing this but after 9 and a half years today is my last day at Sparkbox. ]]>
+          </description>
+          <content:encoded>&lt;![CDATA[
+            <p>I can’t believe I’m writing this but after 9 and a half years today is my last day at <a href="https://sparkbox.com">Sparkbox</a>.</p>
+<p>Now, I know it can be problematic to think about work like your (extended) family but when you work at the same place through your twenties and early thirties, have 3 different apartments, buy a house, and have two kids it’s impossible not to view that place differently. I can confidently say Sparkbox changed my life. The team there will always have a special place in my heart.</p>
+<p><em>deep breath</em></p>
+<p>So where to? Well, I’m super stoked to be joining <a href="https://grafana.com">Grafana</a> as a Senior Software Engineer on their Cloud Data team! I’m looking forward to writing more Go, solving new problems, and learning from the stellar folks there.</p>
+<p>Here we go…</p>
+
+            <a href="mailto:~asimpson/public-inbox@lists.sr.ht?Subject=Re: %f0%9f%91%8b%20Sparkbox">Discuss further in my public inbox</a>
+          ]]></content:encoded>
+      </item>
+      <item>
+        <title>Thirty five</title>
+          <link>https://adamsimpson.net/writing/thirty-five/</link>
+
+        <guid>https://adamsimpson.net/writing/thirty-five/</guid>
+        <pubDate>Thu, 03 Mar 2022 10:28:44 -0500</pubDate>
+          <description>
+            &lt;![CDATA[ It&#39;s been 5 years since I wrote &#39;Thirty&#39;. So now I have to come up with 35 things as I turned 35 yesterday. ]]>
+          </description>
+          <content:encoded>&lt;![CDATA[
+            <p>Well crap.</p>
+<p>It&rsquo;s been 5 years since I wrote <a href="/writing/thirty">&ldquo;Thirty&rdquo;</a>. So now I have to come up with 35 things as I turned 35 yesterday. If anything from Thirty is grossly wrong or really interesting I&rsquo;ll update it at the same number eh?</p>
+<p>Let&rsquo;s go&hellip;</p>
+<ol>
+<li>I still don&rsquo;t have it figured out, but this isn&rsquo;t such a shock anymore.</li>
+<li>Building a house is <em>more</em> scary.</li>
+<li>Minivans are <em>awesome</em>.</li>
+<li>Expecting a third kid is not nearly as scary as expecting the first.</li>
+<li>COVID sucked.</li>
+<li>Modern medicine is pretty cool actually.</li>
+<li>More stuff hurts, still just as healthy.</li>
+<li>Dishwashers aren&rsquo;t really as scary to repair as they seem (but that doesn&rsquo;t mean you won&rsquo;t lose your mind fixing one).</li>
+<li>The feeling you get as a parent when your kid gets hurt is impossible to describe.</li>
+<li>Being knocked out from a crazy car accident is also no fun.</li>
+<li>Carseats are magic.</li>
+<li>I&rsquo;ve accepted that the music I liked in 2010 is going to be the music I&rsquo;ll like forever.</li>
+<li>Thanks to the internet there is an endless stream of new music that is at home with music from 2010 or even 2000 (Underoath just released a new album for crying out loud).</li>
+<li>Open source software is incredible.</li>
+<li>The thrill from in-progress software working for the first time will never get old for me.</li>
+<li>Feedback loops are important in every area of life not just software.</li>
+<li>The year of Linux on the desktop is a moving target.</li>
+<li>RSS will never die.</li>
+<li>Mechanical keyboards are a refreshing change and I&rsquo;m not sure why.</li>
+<li>The Aeropress is still incredible.</li>
+<li>Computers were a mistake.</li>
+<li>Computers are a miracle.</li>
+<li>The Three-Body Problem trilogy continues to knock around in my brain months after finishing it.</li>
+<li>Watching your child accomplish something for the first time that they&rsquo;ve been working on is a feeling unlike any other.</li>
+<li>I&rsquo;ve realized I learn best by doing, I need to get better at accounting for the bumps along the way.</li>
+<li>I write things down to remember them later not to look them up later which means most note systems are not worth the trouble for me.</li>
+<li>Life will be shallow if you only hang out with people like you.</li>
+<li>Anything is possible on an infinite timescale the trick is figuring out what do with finite time.</li>
+<li>RIP Rdio.</li>
+<li>Never pass on an opportunity to twirl your kids around when they&rsquo;re small. They get big fast.</li>
+<li>Hanlon&rsquo;s razor explains most of social media.</li>
+<li>If you work at a desk all day you owe it to yourself to remove as much Bluetooth from that setup as possible.</li>
+<li>None of your peers has it all figured out. Ask them &ldquo;dumb&rdquo; questions.</li>
+<li>Properly evaluating risks when your kids are involved is <em>hard</em>.</li>
+<li>Keep a sweatshirt handy by your bed when your kids are young, getting up at 2am in the winter is <em>cold</em>.</li>
+</ol>
+<p>❤️ you Christi</p>
+
+            <a href="mailto:~asimpson/public-inbox@lists.sr.ht?Subject=Re: Thirty%20five">Discuss further in my public inbox</a>
+          ]]></content:encoded>
+      </item>
+      <item>
+        <title>Windows 11 as KVM guest</title>
+          <link>https://adamsimpson.net/writing/windows-11-as-kvm-guest/</link>
+
+        <guid>https://adamsimpson.net/writing/windows-11-as-kvm-guest/</guid>
+        <pubDate>Mon, 28 Feb 2022 13:39:37 -0500</pubDate>
+          <description>
+            &lt;![CDATA[ How I work with Windows 11 as a KVM guest on a NixOS host using virt-manager. ]]>
+          </description>
+          <content:encoded>&lt;![CDATA[
+            <p>Windows 11 famously has new, stricter <a href="https://www.microsoft.com/en-us/windows/windows-11-specifications">requirements for installation</a>; a TPM device and Secure Boot. Here&rsquo;s how I satisfied those requirements with Windows 11 as a KVM guest with NixOS as the host. The following is pulled from my <a href="https://github.com/asimpson/dotfiles/commit/ab08fd88a5617d9199f78726c1f22f32b8fc85d0">NixOS <code>configuration.nix</code></a>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>libvirtd<span style="color:#f92672">.</span>qemu <span style="color:#960050;background-color:#1e0010">=</span> {
+</span></span><span style="display:flex;"><span>  package <span style="color:#f92672">=</span> pkgs<span style="color:#f92672">.</span>qemu_kvm;
+</span></span><span style="display:flex;"><span>  runAsRoot <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
+</span></span><span style="display:flex;"><span>  swtpm<span style="color:#f92672">.</span>enable <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
+</span></span><span style="display:flex;"><span>  ovmf <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    enable <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
+</span></span><span style="display:flex;"><span>    package <span style="color:#f92672">=</span> (pkgs<span style="color:#f92672">.</span>OVMFFull<span style="color:#f92672">.</span>override {
+</span></span><span style="display:flex;"><span>      secureBoot <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
+</span></span><span style="display:flex;"><span>      tpmSupport <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><p>The most important bit is the <code>pkgs.OVMFFull.override</code> section where you must specify <code>tpmSupport</code> and <code>secureBoot</code> as <code>true</code>.</p>
+<p>In <a href="https://virt-manager.org/">virt-manager</a> you&rsquo;ll need to add &ldquo;new hardware&rdquo; and select TPM v2.0. Here&rsquo;s the relevant XML from my config:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;tpm</span> <span style="color:#a6e22e">model=</span><span style="color:#e6db74">&#34;tpm-crb&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&lt;backend</span> <span style="color:#a6e22e">type=</span><span style="color:#e6db74">&#34;emulator&#34;</span> <span style="color:#a6e22e">version=</span><span style="color:#e6db74">&#34;2.0&#34;</span><span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/tpm&gt;</span>
+</span></span></code></pre></div><p>With the above settings you should be able to go through the Windows 11 installer and get the machine up and running as a KVM guest.</p>
+<h2 id="stretch-goal-nested-virtualization">Stretch goal: nested virtualization</h2>
+<p>If you want to use Docker or WSL 2 inside KVM you&rsquo;ll need to enable &ldquo;nested virtualization&rdquo; in virt-manager. I couldn&rsquo;t figure this out until I found <a href="https://superuser.com/a/1589286">this great answer on superuser</a>.</p>
+<p>My original CPU config XML looked like this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;cpu</span> <span style="color:#a6e22e">mode=</span><span style="color:#e6db74">&#34;host-model&#34;</span> <span style="color:#a6e22e">check=</span><span style="color:#e6db74">&#34;partial&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&lt;topology</span> <span style="color:#a6e22e">sockets=</span><span style="color:#e6db74">&#34;1&#34;</span> <span style="color:#a6e22e">dies=</span><span style="color:#e6db74">&#34;1&#34;</span> <span style="color:#a6e22e">cores=</span><span style="color:#e6db74">&#34;2&#34;</span> <span style="color:#a6e22e">threads=</span><span style="color:#e6db74">&#34;4&#34;</span><span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/cpu&gt;</span>
+</span></span></code></pre></div><p>The new XML looks like this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;cpu</span> <span style="color:#a6e22e">mode=</span><span style="color:#e6db74">&#34;custom&#34;</span> <span style="color:#a6e22e">match=</span><span style="color:#e6db74">&#34;exact&#34;</span> <span style="color:#a6e22e">check=</span><span style="color:#e6db74">&#34;partial&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&lt;model</span> <span style="color:#a6e22e">fallback=</span><span style="color:#e6db74">&#34;allow&#34;</span><span style="color:#f92672">&gt;</span>Skylake-Client-noTSX-IBRS<span style="color:#f92672">&lt;/model&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&lt;topology</span> <span style="color:#a6e22e">sockets=</span><span style="color:#e6db74">&#34;1&#34;</span> <span style="color:#a6e22e">dies=</span><span style="color:#e6db74">&#34;1&#34;</span> <span style="color:#a6e22e">cores=</span><span style="color:#e6db74">&#34;2&#34;</span> <span style="color:#a6e22e">threads=</span><span style="color:#e6db74">&#34;4&#34;</span><span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&lt;feature</span> <span style="color:#a6e22e">policy=</span><span style="color:#e6db74">&#34;disable&#34;</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;hypervisor&#34;</span><span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&lt;feature</span> <span style="color:#a6e22e">policy=</span><span style="color:#e6db74">&#34;require&#34;</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;vmx&#34;</span><span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/cpu&gt;</span>
+</span></span></code></pre></div><p>With this applied I could install WSL2 <em>and</em> get Docker Desktop for Windows installed and running.</p>
+
+            <a href="mailto:~asimpson/public-inbox@lists.sr.ht?Subject=Re: Windows%2011%20as%20KVM%20guest">Discuss further in my public inbox</a>
+          ]]></content:encoded>
+      </item>
+      <item>
+        <title>A few POSIX shell tips</title>
+          <link>https://adamsimpson.net/writing/a-few-posix-shell-tips/</link>
+
+        <guid>https://adamsimpson.net/writing/a-few-posix-shell-tips/</guid>
+        <pubDate>Mon, 19 Jul 2021 14:53:16 -0400</pubDate>
+          <description>
+            &lt;![CDATA[ I wrote down a few of my most used POSIX shell commands and features. ]]>
+          </description>
+          <content:encoded>&lt;![CDATA[
+            <p>I was recently working on the <a href="https://github.com/sparkbox/sb/commit/f9d2a0bc5339c4777e73432d9a8208b092a2e9ac">release build script</a> for <a href="https://github.com/sparkbox/sb"><code>sb</code></a> and decided I should document a few things I find myself looking up just about every time. One of the advantages of the POSIX shell (not bash, zsh, but Bourne shell, usually <code>/bin/sh</code> on most unix-y systems) is that it has <a href="https://pubs.opengroup.org/onlinepubs/9699919799/utilities/contents.html">a specification</a> however I&rsquo;m usually frustrated trying to find the information I need.</p>
+<!-- raw HTML omitted -->
+<p>You can check it out here: <a href="https://github.com/sparkbox/sb">https://github.com/sparkbox/sb</a></p>
+<!-- raw HTML omitted -->
+<p>I prefer the POSIX shell because it&rsquo;s <em>the default</em> on most unix-y system. If I have to be sure if the shell is installed on the target system (like <code>bash</code> or <code>zsh</code>) I&rsquo;d rather just use a higher-level scripting language like node or ruby where the same requirement exists.</p>
+<h2 id="arrays">Arrays</h2>
+<p>Psych! There aren&rsquo;t any arrays. Bash has arrays but POSIX does not. If I need an array structure I can use a space-separated string (or another delimiter if you&rsquo;ve set <a href="https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_05_03"><code>$IFS</code></a>) as the data structure, e.g. <code>PLATFORMS=&quot;arm64-darwin amd64-linux amd64-darwin&quot;</code>. Now I can loop over the variable using a for loop:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>PLATFORMS<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;arm64-darwin amd64-linux amd64-darwin&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> PLATFORM in <span style="color:#e6db74">${</span>PLATFORMS<span style="color:#e6db74">}</span>; <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># GOOS=FOO GOARCH=BAR go build ...</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">done</span>
+</span></span></code></pre></div><p>Or I can take the lack of arrays as a signal I should stop writing a shell script and reach for a language that has the concept of arrays to solve my problem.</p>
+<h2 id="conditional-flags">Conditional &ldquo;flags&rdquo;</h2>
+<p>I often forget the various flags one can use in a conditional (aka test/if) statement. Here&rsquo;s the <a href="https://pubs.opengroup.org/onlinepubs/9699919799/utilities/test.html">documentation</a> and here are a few of my favorites:</p>
+<ul>
+<li><code>-n</code> tests if the string is non-zero, e.g.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> -n <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>UPLOAD_URL<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>    upload_file <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>PLATFORM<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fi</span>
+</span></span></code></pre></div><ul>
+<li><code>-z</code> the opposite of <code>-n</code>.</li>
+<li><code>-f</code> tests if the pathname resolves to a file.</li>
+</ul>
+<h2 id="functions-and-args">Functions and args</h2>
+<ul>
+<li>Functions must be declared before they are invoked.</li>
+<li>Functions look like:</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>someFunc<span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>  echo <span style="color:#e6db74">&#34;a func!&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><ul>
+<li>There is no syntax for functions accepting args instead they are mapped to <code>$n</code>. <code>$@</code> is all the args.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>upload_file<span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>    NAME<span style="color:#f92672">=</span>$1
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    zip <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>NAME<span style="color:#e6db74">}</span><span style="color:#e6db74">.zip&#34;</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>NAME<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>    curl -H <span style="color:#e6db74">&#34;Accept: application/vnd.github.v3+json&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>         -H <span style="color:#e6db74">&#34;Authorization: Bearer </span><span style="color:#e6db74">${</span>GITHUB_TOKEN<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>         -H <span style="color:#e6db74">&#34;Content-Type: application/zip&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>         --data-binary <span style="color:#e6db74">&#34;@</span><span style="color:#e6db74">${</span>NAME<span style="color:#e6db74">}</span><span style="color:#e6db74">.zip&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>         <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>UPLOAD_URL<span style="color:#e6db74">}</span><span style="color:#e6db74">?name=</span><span style="color:#e6db74">${</span>NAME<span style="color:#e6db74">}</span><span style="color:#e6db74">.zip&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>upload_file <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>PLATFORM<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span></code></pre></div><h2 id="use-shellcheck">Use shellcheck</h2>
+<p>This is just preference but I really love using <a href="https://www.shellcheck.net/"><code>shellcheck</code></a> to avoid any footguns and enforce a consistent style with my shell scripts. I typically invoke it like this: <code>shellcheck -o all script-name.sh</code>.</p>
+
+            <a href="mailto:~asimpson/public-inbox@lists.sr.ht?Subject=Re: A%20few%20POSIX%20shell%20tips">Discuss further in my public inbox</a>
+          ]]></content:encoded>
+      </item>
+      <item>
+        <title>Recently</title>
+          <link>https://adamsimpson.net/writing/recently-16/</link>
+
+        <guid>https://adamsimpson.net/writing/recently-16/</guid>
+        <pubDate>Fri, 23 Apr 2021 11:37:19 -0400</pubDate>
+          <description>
+            &lt;![CDATA[ A random assortment of links and miscellaneous updates on things. ]]>
+          </description>
+          <content:encoded>&lt;![CDATA[
+            <p>I&rsquo;m stealing the title format of this post from <a href="https://macwright.com/">Tom MacWright&rsquo;s</a> Recently posts.</p>
+<p>Here&rsquo;s a random assortment of links and miscellaneous updates on things.</p>
+<h2 id="autofs">autofs</h2>
+<p><a href="https://help.ubuntu.com/community/Autofs">autofs</a> is a cool utility that watches a specific directory path and when a program tries to read or write to that path it mounts a filesystem at that location. I&rsquo;m using this to auto mount my NAS via SMB for <a href="https://www.musicpd.org">mpd</a>. With autofs in place I can run mpd locally (in a <a href="https://www.musicpd.org/doc/html/user.html#satellite-setup">&ldquo;satellite setup&rdquo;</a>) and have its <code>music_directory</code> point to a path managed by autofs.</p>
+<p>One thing that was helpful getting the configuration right was testing autofs by running <code>automount -f -v</code> directly which puts it in the foreground and gives verbose output.</p>
+<p>The two files I configured were <code>auto.master.d/foo.autofs</code> and <code>auto.foo</code>.</p>
+<ul>
+<li><strong>foo.autofs</strong> contains one line: <code>/- /etc/auto.foo</code></li>
+<li><strong>auto.foo</strong> contains one line as well: <code>/foo -fstype=cifs,rw,credentials=/home/me/.foo-creds ://NAS.IP/foo</code></li>
+</ul>
+<h2 id="mailpreview-updates">mailpreview updates</h2>
+<p><a href="https://git.sr.ht/~asimpson/mailpreview-cli">mailpreview-cli</a> is a little program I use multiple times a day to quickly see my unread email without moving from what I&rsquo;m currently working on and without touching my mouse. I recently noticed it wasn&rsquo;t grabbing the body of a specific type of email. In the process of fixing that I also added proper unit tests for every format I currently parse through. Yay faster feedback loops!</p>
+<h2 id="ffmpeg">ffmpeg</h2>
+<p>I&rsquo;ve been a fan of OBS for awhile now. I was recently doing a quick screen recording of my browser window and the browser window wasn&rsquo;t full-screen so there were black bars around the edges of the recording. I didn&rsquo;t love that but it&rsquo;s time to touch the &ldquo;ffmpeg exists and is awesome&rdquo; sign again.</p>
+<p><a href="https://superuser.com/a/810524">This superuser post</a> has the answer which consists of two steps:</p>
+<ol>
+<li>Get the crop parameters of the video from ffmpeg. ffmpeg will detect the black borders and report back the actual content coordinates.
+<code>ffmpeg.exe -i '.\some-video.mkv' -vf cropdetect -f null -</code></li>
+<li>Re-encode and crop using the crop parameters to trim the borders.
+<code>ffmpeg.exe -i '.\some-video.mkv' -vf crop=624:704:332:10 -c:a copy output.mp4</code></li>
+<li>Enjoy your pristine video.</li>
+</ol>
+<h2 id="links-ive-enjoyed">Links I&rsquo;ve enjoyed</h2>
+<ul>
+<li><a href="https://fly.io/blog/docker-without-docker/">Docker without docker</a>
+Really anything on the fly.io blog is <em>gold</em>.</li>
+<li><a href="https://www.youtube.com/watch?v=RqubKSF3wig">David Crawshaw: SQLite and Go</a>(Talk)</li>
+<li><a href="https://blog.benjojo.co.uk/post/dns-filesystem-true-cloud-storage-dnsfs">DNSFS</a></li>
+<li><a href="https://stevelosh.com/blog/2021/03/small-common-lisp-cli-programs/">Writing Small CLI Programs in Common Lisp</a></li>
+<li><a href="https://www.wired.com/story/my-dream-of-the-great-unbundling/">My Dream of the Great Unbundling</a></li>
+</ul>
+<p>Fin</p>
+
+            <a href="mailto:~asimpson/public-inbox@lists.sr.ht?Subject=Re: Recently">Discuss further in my public inbox</a>
+          ]]></content:encoded>
+      </item>
+      <item>
+        <title>A firewall in 8 lines</title>
+          <link>https://adamsimpson.net/writing/8-line-firewall/</link>
+
+        <guid>https://adamsimpson.net/writing/8-line-firewall/</guid>
+        <pubDate>Wed, 31 Mar 2021 11:18:24 -0400</pubDate>
+          <description>
+            &lt;![CDATA[ You only need about 8 lines in iptables to have a great home firewall. ]]>
+          </description>
+          <content:encoded>&lt;![CDATA[
+            <p>Since 2017 my home router has been a <a href="https://ark.intel.com/content/www/us/en/ark/products/95597/intel-celeron-processor-j3355-2m-cache-up-to-2-5-ghz.html">plain x86 box</a> running Alpine Linux. I never really think about it anymore. Recently, I was helping a relative set up their own Linux-based router and took the time to appreciate how little config is needed to setup a serviceable home router firewall using <code>iptables</code>. You can see my base rule-sets (port forwarding omitted) below:</p>
+<pre tabindex="0"><code>-P INPUT DROP
+-P FORWARD DROP
+-P OUTPUT ACCEPT
+-A INPUT -i lo -j ACCEPT
+-A INPUT -i eth1 -j ACCEPT
+-A INPUT -i eth0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+-A FORWARD -i eth1 -o eth0 -j ACCEPT
+-A FORWARD -i eth0 -o eth1 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+</code></pre><p>The benefit of running a x86 box with Alpine (or any version of Linux) is that the box will receive a steady stream of security updates and upgraded kernels as Alpine Linux releases new versions. This is a much better situation to be in than relying on OS and security updates from a vendor like TPLink or Linksys.</p>
+<p>If you have ideas for how to improve the config I listed above or want to chat more about home network stuff, send an email to my <a href="https://lists.sr.ht/~asimpson/public-inbox">public-inbox</a>.</p>
+
+            <a href="mailto:~asimpson/public-inbox@lists.sr.ht?Subject=Re: A%20firewall%20in%208%20lines">Discuss further in my public inbox</a>
+          ]]></content:encoded>
+      </item>
+      <item>
+        <title>How to use Siji font on polybar</title>
+          <link>https://www.reddit.com/r/Polybar/comments/ht0jnr/guide_how_to_use_the_siji_font_on_polybar/</link>
+
+        <guid>https://adamsimpson.net/writing/how-to-use-siji-font-on-polybar/</guid>
+        <pubDate>Fri, 06 Nov 2020 11:18:47 -0500</pubDate>
+          <content:encoded>&lt;![CDATA[
+            <p>Nice guide on Reddit about how to use the <a href="https://github.com/stark/siji">Siji font</a> with polybar.</p>
+<blockquote>
+<p>[..] install the siji font, and then run <code>&quot;view.sh&quot;</code> in the terminal. If you get an error, try to launch the <code>install.sh</code> again. You&rsquo;ll get a list of all the glyphs available, select the one you want [..] to use and then look where it says &ldquo;Character 0x00e002&rdquo; or something like that.</p>
+</blockquote>
+<p>Of note is that you&rsquo;ll end up with weird looking glyphs but siji will interpret it correctly. This is because Siji maps character codes to different icons than other fonts do.</p>
+
+            <a title="permalink for How to use Siji font on polybar" href="https://adamsimpson.net/writing/how-to-use-siji-font-on-polybar/">🔗</a>
+            <a href="mailto:~asimpson/public-inbox@lists.sr.ht?Subject=Re: How%20to%20use%20Siji%20font%20on%20polybar">Discuss further in my public inbox</a>
+          ]]></content:encoded>
+      </item>
+      <item>
+        <title>On Polybar bitmap fonts and Ubuntu</title>
+          <link>https://adamsimpson.net/writing/polybar-fonts-and-ubuntu/</link>
+
+        <guid>https://adamsimpson.net/writing/polybar-fonts-and-ubuntu/</guid>
+        <pubDate>Fri, 06 Nov 2020 10:15:09 -0500</pubDate>
+          <description>
+            &lt;![CDATA[ Enable bitmap fonts on Ubuntu for an optimal polybar experience. ]]>
+          </description>
+          <content:encoded>&lt;![CDATA[
+            <p>I use <a href="https://polybar.github.io/">polybar</a> as my status bar in i3 and it&rsquo;s been going great for months now. However, I was recently grepping through the <code>syslog</code> trying to figure out why a browser crash happened and the log was filled with polybar spam that looked like this: <code>polybar|warn:  Dropping unmatched character</code>. So I started picking at solving the warning.</p>
+<p>Turns out there&rsquo;s a <a href="https://github.com/polybar/polybar/issues/392#issuecomment-310778138">Github issue</a> that contains the solution which is to enable bitmap fonts which I&rsquo;ll paste here for posterity:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#75715e"># &#34;Un-disable&#34; bitmap fonts</span>
+</span></span><span style="display:flex;"><span>sudo rm /etc/fonts/conf.d/70-no-bitmaps.conf
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Clear the font cache</span>
+</span></span><span style="display:flex;"><span>sudo fc-cache -f -v
+</span></span></code></pre></div><p>Apparently Ubuntu disables bitmap fonts by default but polybar uses bitmap fonts for icon rendering. I also needed to install the <a href="https://github.com/stark/siji">sijj icon font family</a> which was painless.</p>
+
+            <a href="mailto:~asimpson/public-inbox@lists.sr.ht?Subject=Re: On%20Polybar%20bitmap%20fonts%20and%20Ubuntu">Discuss further in my public inbox</a>
+          ]]></content:encoded>
+      </item>
+      <item>
+        <title>Recently</title>
+          <link>https://adamsimpson.net/writing/recently-44/</link>
+
+        <guid>https://adamsimpson.net/writing/recently-44/</guid>
+        <pubDate>Tue, 27 Oct 2020 23:30:46 -0400</pubDate>
+          <description>
+            &lt;![CDATA[ I&#39;ve written a few small tools over the last couple months and I figured it&#39;s time I post about them. ]]>
+          </description>
+          <content:encoded>&lt;![CDATA[
+            <p>I&rsquo;ve published a few new projects in the last couple of months and I&rsquo;m behind on announcing them, so I bundled them up together into this post. I&rsquo;m stealing the title format of this post from <a href="https://macwright.com/">Tom MacWright&rsquo;s</a> Recently posts.</p>
+<p>One thing to note is that the source code for all these projects is stored on <a href="https://sourcehut.org/">sourcehut</a>. Sourcehut (or sr.ht) bills itself as &ldquo;the hacker&rsquo;s forge&rdquo;. I highly recommend checking it out. It&rsquo;s also where I host <a href="https://lists.sr.ht/~asimpson/public-inbox">my public inbox</a>.</p>
+<h2 id="hover-dns">hover-dns</h2>
+<p>Now that I have fiber internet at the house I&rsquo;ve been hosting one-off services and apps on my own hardware at the house. This is great, however my residential connection is a typical dynamic IP not a static one. Instead of using a service like <a href="https://account.dyn.com/">DynamicDNS</a> I decided to write some Rust (shocker) and leverage the &ldquo;unofficial&rdquo; Hover API. The result is: <a href="https://git.sr.ht/~asimpson/hover-dns">hover-dns</a>.</p>
+<p>I have <code>hover-dns</code> running in a crontab for a few different domains to keep my domains pointed to the correct IP for my house. While I&rsquo;m a little uncomfortable with how similar <code>npm</code> and <code>cargo</code> can feel, the <a href="https://docs.rs/trust-dns-resolver"><code>trust-dns</code></a> package is <em>excellent</em>. I was able to quickly read the source code to understand how to setup a <code>Resolver</code> for <a href="https://www.opendns.com/">opendns</a>. Also impressive is that <code>hover-dns ip</code> beats out <code>dig</code> in returning your public IP. I didn&rsquo;t expect that!</p>
+<h2 id="podcastfilter">podcastfilter</h2>
+<p>Speaking of hosting things at home, <a href="https://podcastfilter.com">podcastfilter.com</a> is one of those things. <a href="https://git.sr.ht/~asimpson/podcast-filter">podcast-filter is a small Go project</a> that allows you to filter a podcast feed by each episode&rsquo;s description and return a feed of just those episodes that match.</p>
+<h2 id="mailpreview">mailpreview</h2>
+<p>The recent project I use the most day-to-day is <a href="https://git.sr.ht/~asimpson/mailpreview-cli">mailpreview-cli</a>. <code>mailpreview-cli</code> is very straight-forward, it accepts a Mail message and returns either the plain text version or the html version of that message. The reason I don&rsquo;t just pull the Mail message directly is because a Mail message can contain several versions of the message in different encodings (start here if you&rsquo;re curious: <a href="https://tools.ietf.org/html/rfc822">RFC-822</a>). Instead of writing my own parser I grabbed the excellent <a href="https://docs.rs/mailparse/">mailparse crate</a> and wrapped the behavior I wanted around it. On it&rsquo;s own <code>mailpreview-cli</code> isn&rsquo;t super fancy but I trigger it from <code>rofi</code> via a <a href="https://github.com/asimpson/dotfiles/blob/master/linux/mail-preview">shell script</a> which allows me to browse (and then view) all my unread emails right from <code>rofi</code>. Shameless plug: I wrote a short post about <a href="https://adamsimpson.net/writing/getting-started-with-rofi">getting started with <code>rofi</code></a> if you&rsquo;re unfamiliar. <code>mailpreview-cli</code> could be used with <a href="https://www.alfredapp.com/">Alfred</a> if you&rsquo;re on a Mac to accomplish the same thing as I&rsquo;m doing with a shell script and <code>rofi</code>.</p>
+<p>Fin</p>
+
+            <a href="mailto:~asimpson/public-inbox@lists.sr.ht?Subject=Re: Recently">Discuss further in my public inbox</a>
+          ]]></content:encoded>
+      </item>
+      <item>
+        <title>Four ways to approach Hacktoberfest 2020</title>
+          <link>https://adamsimpson.net/writing/four-ways-to-approach-hacktoberfest-2020/</link>
+
+        <guid>https://adamsimpson.net/writing/four-ways-to-approach-hacktoberfest-2020/</guid>
+        <pubDate>Thu, 01 Oct 2020 10:26:38 -0400</pubDate>
+          <description>
+            &lt;![CDATA[ I came up with a four different approaches for Hacktoberfest this year: The Dependency Scrub, Polygot Achievement, Unknown Lands, and the Bug Doctor. ]]>
+          </description>
+          <content:encoded>&lt;![CDATA[
+            <p>Hacktoberfest 2020 is here! I can&rsquo;t believe 2020 is winding down, good riddance!</p>
+<p>I&rsquo;ve been talking about Hacktoberfest with my co-worker <a href="https://www.bryanbraun.com/">Bryan</a> and I thought of four different approaches to Hacktoberfest this year that I wanted to share.</p>
+<!-- raw HTML omitted -->
+<h2 id="dependency-scrub">Dependency scrub</h2>
+<p>This is probably common everywhere but the Javascript/web communities are filled with npm packages. It&rsquo;s packages all the way down. I think it would be interesting to approach this month looking for ways to remove third-party code from projects you love and use frequently.</p>
+<h2 id="polygot-achievement">Polygot Achievement</h2>
+<p>Try to submit four pull requests in four different languages. As <a href="https://drewdevault.com/2018/03/17/Hack-everything-without-fear.html">Drew DeVault writes</a>: Hack everything without fear!</p>
+<h2 id="unknown-lands">Unknown lands</h2>
+<p>Similar to the previous one it could be fun to submit PRs against a project you&rsquo;ve never been in before that&rsquo;s in a language you don&rsquo;t know. This could be anything from diving into Wordpress core, to working on some C for some Linux utilities, or even submitting PRs to open source Mac/iOS applications.</p>
+<h2 id="bug-doctor">Bug doctor</h2>
+<p>Go into a project and find the oldest issues and try to resolve them via PR. This is inspired by <a href="https://schneems.com/2020/09/22/triage-with-me-11-issues-2-prs-in-15-hours/">Richard Schneeman&rsquo;s video</a> and post where he runs through 11 issues and 2 PRs in a hour and a half.</p>
+<p>How are you approaching Hacktoberfest this year? My <!-- raw HTML omitted -->public inbox<!-- raw HTML omitted --> is open, let me know!</p>
+
+            <a href="mailto:~asimpson/public-inbox@lists.sr.ht?Subject=Re: Four%20ways%20to%20approach%20Hacktoberfest%202020">Discuss further in my public inbox</a>
+          ]]></content:encoded>
+      </item>
+      <item>
+        <title>Small tech</title>
+          <link>https://scattered-thoughts.net/writing/small-tech/</link>
+
+        <guid>https://adamsimpson.net/writing/small-tech/</guid>
+        <pubDate>Fri, 25 Sep 2020 15:53:06 -0400</pubDate>
+          <content:encoded>&lt;![CDATA[
+            <p><a href="https://scattered-thoughts.net/">Jamie Brandon</a> has a nice post about &ldquo;small tech&rdquo;: tech that isn&rsquo;t backed by a big corporation like Microsoft or Apple but still has an out-sized impact. I love the post and I thought I would add a few additional products to the list.</p>
+<ul>
+<li>
+<p><a href="https://curl.haxx.se/">curl</a> is open-source and has thousands of contributors but is still primarily designed and managed by <a href="https://daniel.haxx.se/">@bagder (Daniel Stenberg)</a>. If you ever do anything with http for any kind of development mastering <code>curl</code> is worth the time investment.</p>
+</li>
+<li>
+<p><a href="https://git-scm.com/">git</a> is <em>the</em> premier version control system on the planet. It started out as a side-project to manage Linux kernel development.</p>
+</li>
+<li>
+<p><a href="https://www.alpinelinux.org/">Alpine Linux</a> is a Linux distribution that is maintained by a small group of folks and yet is the first choice for most folks when creating Docker images.</p>
+</li>
+<li>
+<p><a href="https://sr.ht/">sr.ht</a> does not have the type of scale or impact that the others items on this list have <em>but</em> I think it could some day. sr.ht is version control host, issue tracker, mailing list tool, and CI toolbox. It competes directly with Github, Gitlab, and Bitbucket. However, sr.ht is run by one person—<a href="https://drewdevault.com/">Drew DeVault</a>—and is 100% open-source.</p>
+</li>
+</ul>
+
+            <a title="permalink for Small tech" href="https://adamsimpson.net/writing/small-tech/">🔗</a>
+            <a href="mailto:~asimpson/public-inbox@lists.sr.ht?Subject=Re: Small%20tech">Discuss further in my public inbox</a>
+          ]]></content:encoded>
+      </item>
+      <item>
+        <title>Indexing My Blog’s Links</title>
+          <link>https://blog.jim-nielsen.com/2020/indexing-my-blogs-links/</link>
+
+        <guid>https://adamsimpson.net/writing/indexing-my-blogs-links/</guid>
+        <pubDate>Fri, 25 Sep 2020 15:49:21 -0400</pubDate>
+          <content:encoded>&lt;![CDATA[
+            <p>Owning your content means you can do interesting things with that data. <a href="https://blog.jim-nielsen.com/">Jim Nielsen</a> did just that by tweaking his static site generator to see all the outbound links he&rsquo;s ever posted.</p>
+
+            <a title="permalink for Indexing My Blog’s Links" href="https://adamsimpson.net/writing/indexing-my-blogs-links/">🔗</a>
+            <a href="mailto:~asimpson/public-inbox@lists.sr.ht?Subject=Re: Indexing%20My%20Blog%e2%80%99s%20Links">Discuss further in my public inbox</a>
+          ]]></content:encoded>
+      </item>
+      <item>
+        <title>Compose key and i3</title>
+          <link>https://adamsimpson.net/writing/compose-key-and-i3/</link>
+
+        <guid>https://adamsimpson.net/writing/compose-key-and-i3/</guid>
+        <pubDate>Fri, 18 Sep 2020 11:28:19 -0400</pubDate>
+          <description>
+            &lt;![CDATA[ Here&#39;s how to bind the compose key to caps lock in i3wm. ]]>
+          </description>
+          <content:encoded>&lt;![CDATA[
+            <p>The <a href="https://en.wikipedia.org/wiki/Compose_key">compose key</a> on Linux and other systems enables you to enter symbols like ™ that don&rsquo;t have a dedicated key on most keyboards. GNOME makes this <a href="https://help.gnome.org/users/gnome-help/stable/tips-specialchars.html.en">easy to do via Gnome Tweaks</a>. However, using a window manager like i3 means there&rsquo;s no dedicated GUI for changing the hotkey for compose.</p>
+<p><a href="https://unix.stackexchange.com/a/195160/41593">This stackexchange answer</a> sent me down the right path of adding the following config to <code>~/.Xmodmap</code> to bind Caps lock to compose:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ini" data-lang="ini"><span style="display:flex;"><span><span style="color:#a6e22e">.keysym 66</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">Mode_switch</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">clear Lock</span>
+</span></span></code></pre></div><p>You can then enable the key map by running:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>xmodmap ~/.Xmodmap
+</span></span></code></pre></div><p>However, that config didn&rsquo;t work because <code>Mode_switch</code> wasn&rsquo;t the right name for the compose key (at least under Ubuntu/PopOS 20 for me). The <a href="https://wiki.archlinux.org/index.php/Xorg/Keyboard_configuration#Configuring_compose_key">Arch Wiki states</a> that the name for the compose key is actually <code>Multi_key</code>. With this new name I was able to get Caps lock to act as the compose key by updating the config in <code>~/.Xmodmap</code> to:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ini" data-lang="ini"><span style="display:flex;"><span><span style="color:#a6e22e">keycode 66</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">Multi_key</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">clear Lock</span>
+</span></span></code></pre></div><p>The final step is to set that mapping every time i3 runs by putting this inside your <a href="https://github.com/asimpson/dotfiles/commit/c86e4216e09e940c2cf7126581e8e69b95fe1511">i3 config file like so</a>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>exec --no-startup-id <span style="color:#e6db74">&#34;xmodmap ~/.Xmodmap&#34;</span>
+</span></span></code></pre></div>
+            <a href="mailto:~asimpson/public-inbox@lists.sr.ht?Subject=Re: Compose%20key%20and%20i3">Discuss further in my public inbox</a>
+          ]]></content:encoded>
+      </item>
+      <item>
+        <title>cycle v0.3.0 released</title>
+          <link>https://adamsimpson.net/writing/cycle-v030-released/</link>
+
+        <guid>https://adamsimpson.net/writing/cycle-v030-released/</guid>
+        <pubDate>Fri, 11 Sep 2020 12:04:16 -0400</pubDate>
+          <description>
+            &lt;![CDATA[ Cycle version v0.3.0 is now available which features syntax highlighting via Chroma. ]]>
+          </description>
+          <content:encoded>&lt;![CDATA[
+            <p>I just released <a href="https://github.com/asimpson/cycle/releases/tag/v0.3.0">v0.3.0 of <code>cycle</code></a>.</p>
+<p>This version uses <a href="https://github.com/alecthomas/chroma/">Chroma</a> for syntax highlighting instead of <a href="https://pygments.org/">Pygments</a>. I never got Pygments running correctly in <a href="https://docs.netlify.com/configure-builds/get-started/">Netlify&rsquo;s build</a> environment. Chroma requires no dependencies since it&rsquo;s distributed as a static binary and it&rsquo;s also faster due to being written in <a href="https://golang.org/">golang</a>.</p>
+<p>This version also refactors the <code>main</code> function to accept an optional working directory arg. This allows me to build a site via the CL REPL. It also shortens the feedback loop to try out new features.</p>
+
+            <a href="mailto:~asimpson/public-inbox@lists.sr.ht?Subject=Re: cycle%20v0.3.0%20released">Discuss further in my public inbox</a>
+          ]]></content:encoded>
+      </item>
+  </channel>
+</rss>
